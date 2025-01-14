@@ -1,4 +1,5 @@
+- For the Wheel see skbuild folder instructions
+
 To do:
 
-- make a wheel
 - integration
