@@ -1,8 +1,8 @@
 
 # need to change pip rdkit to conda rdkit
-pip uninstall rdkit==2023.9.3 
-conda install rdkit==2023.9.3 -c conda-forge
-conda install boost==1.82.0 -c conda-forge
+- pip uninstall rdkit==2023.9.3 
+- conda install rdkit==2023.9.3 -c conda-forge
+- conda install boost==1.82.0 -c conda-forge
 
 # adjust to your environment and also change the CMakelists.txt file accordingly
 cmake -DPython3_EXECUTABLE=/Users/guillaume-osmo/miniconda3/envs/osmo/bin/python \
