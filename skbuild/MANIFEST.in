@@ -1,0 +1,3 @@
+include CMakeLists.txt
+include README.md
+include cppmordred/cppmordred.cpp
