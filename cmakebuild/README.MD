@@ -1,6 +1,6 @@
 
 Dependencies:
-- rdkit 2023.9.3 conda with include headers and lib
+- rdkit 2023.9.3 from conda forge with include headers and lib
 - eigen3 
 - boost 1.82 (specially python)
 - lapack (faster than eigen3)
