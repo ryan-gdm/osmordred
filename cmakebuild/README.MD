@@ -1,4 +1,11 @@
 
+Dependencies:
+- rdkit 2023.9.3 conda with include headers and lib
+- eigen3 
+- boost 1.82 (specially python)
+- lapack (faster than eigen3)
+- pybind11
+
 # need to change pip rdkit to conda rdkit
 - pip uninstall rdkit==2023.9.3 
 - conda install rdkit==2023.9.3 -c conda-forge
