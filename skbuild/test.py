@@ -3,11 +3,21 @@ import numpy as np
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
+"""
+only for version 1
 try:
     from src.common.chemistry.InformationContent import CalcIC
 except:
     from InformationContent import CalcIC
+"""
 
+
+print('package import')
+import cppmordred as rd
+print(dir(rd))
+
+"""
+only for local built
 try:
     print('local import')
     import sys
@@ -19,7 +29,7 @@ except:
     print('package import')
     import cppmordred as rd
     print(dir(rd))
-
+"""
 
 # Define descriptor computation function
 def CalcMordredCPP(smiles, version=2):
