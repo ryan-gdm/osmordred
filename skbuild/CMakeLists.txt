@@ -19,21 +19,11 @@ set(RDKIT_LIBRARY_DIR "${RDKit_DIR}/lib")
 include_directories(${RDKIT_INCLUDE_DIR})
 link_directories(${RDKIT_LIBRARY_DIR})
 
-# Find pybind11
-set(CMAKE_PREFIX_PATH "/Users/guillaume-osmo/miniconda3/envs/osmo-sandox/share/cmake/pybind11")
 include_directories("/Users/guillaume-osmo/miniconda3/envs/osmo-sandox/include")
-set(pybind11_DIR "/Users/guillaume-osmo/miniconda3/envs/osmo-sandox/lib/python3.11/site-packages/pybind11/share/cmake/pybind11")
-find_package(pybind11 REQUIRED)
-
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-
-# Create the shared library
-pybind11_add_module(cppmordred cppmordred/cppmordred.cpp)
-
 
 # Find and link Eigen
 find_path(EIGEN3_INCLUDE_DIR Eigen/Dense
