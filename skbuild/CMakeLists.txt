@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(RDKitDescriptors)
+project(cppmordred)
 
 # Set policies
 cmake_policy(SET CMP0167 NEW)
@@ -9,11 +9,8 @@ cmake_policy(SET CMP0144 NEW)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Without this, any build libraries automatically have names "lib{x}.so"
-set(CMAKE_SHARED_MODULE_PREFIX "")
-
-# define the C++ library "cppmordred"
-add_library(cppmordred SHARED cppmordred/cppmordred.cpp)
+# define the C++ library "_cppmordred"
+add_library(_cppmordred MODULE cppmordred/cppmordred.cpp)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 include_directories(${PYTHON_INCLUDE_DIR})
@@ -42,9 +39,9 @@ include_directories(${RDKit_INCLUDE_DIRS})
 # This relies on the fact that we're installing it via Conda.
 set(RDKit_HACK_LIBRARY_DIR "${Python3_ROOT_DIR}/lib")
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Find and link Eigen
 find_path(EIGEN3_INCLUDE_DIR Eigen/Dense
@@ -88,7 +85,7 @@ endif()
 
 
 # Find and link RDKit libraries
-target_link_libraries(cppmordred PRIVATE
+target_link_libraries(_cppmordred PRIVATE
     # RDKitGraphMol
     # RDKitDescriptors
     # RDKitFingerprints 
@@ -109,9 +106,13 @@ target_link_libraries(cppmordred PRIVATE
     ${Python3_LIBRARIES}
     )
 
-set(CMAKE_INSTALL_RPATH "${RDKit_HACK_LIBRARY_DIR}")
+# set(CMAKE_INSTALL_RPATH "${RDKit_HACK_LIBRARY_DIR}")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-install(TARGETS cppmordred
-        LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
+set_target_properties(_cppmordred PROPERTIES
+    PREFIX ""
+    SUFFIX ".so"
+)
+
+install(TARGETS _cppmordred LIBRARY DESTINATION cppmordred)
