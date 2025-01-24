@@ -3,33 +3,9 @@ import numpy as np
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
-"""
-only for version 1
-try:
-    from src.common.chemistry.InformationContent import CalcIC
-except:
-    from InformationContent import CalcIC
-"""
 
-
-print('package import')
 import cppmordred as rd
-print(dir(rd))
 
-"""
-only for local built
-try:
-    print('local import')
-    import sys
-    sys.path.append('/Users/guillaume-osmo/Github/mordred-community/cpp/cppmordred/_skbuild/macosx-15.0-arm64-3.11/cmake-install')  # Ensure mordred_cpp is accessible
-    import cppmordred as rd
-    print(dir(rd))
-
-except:
-    print('package import')
-    import cppmordred as rd
-    print(dir(rd))
-"""
 
 # Define descriptor computation function
 def CalcMordredCPP(smiles, version=2):
@@ -44,7 +20,7 @@ def CalcMordredCPP(smiles, version=2):
         v = 2
         doExEstate = True
 
-    mol = Chem.MolFromSmiles(smiles)
+        mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None # Return an empty array instead of None
     results = []
@@ -56,9 +32,9 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcAtomCount(mol, v)))  #  add nHetero in v1.1
         results.append(np.array(rd.CalcAutocorrelation(mol)))
         results.append(np.array(rd.CalcBCUT(mol)))
-        results.append(np.array(rd.CalcBalabanJ(mol)))
+        # results.append(np.array(rd.CalcBalabanJ(mol)))
         results.append(np.array(rd.CalcBaryszMatrix(mol)))
-        results.append(np.array(rd.CalcBertzCT(mol)))
+        # results.append(np.array(rd.CalcBertzCT(mol)))
         results.append(np.array(rd.CalcBondCount(mol)))
         results.append(np.array(rd.CalcRNCGRPCG(mol))) # CPSA 2D descriptors on charges
         results.append(np.array(rd.CalcCarbonTypes(mol, v))) # add calcFractionCSP3 in v1.1
@@ -69,18 +45,18 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcEState(mol, doExEstate))) # no impact True/False
         results.append(np.array(rd.CalcEccentricConnectivityIndex(mol)))
         results.append(np.array(rd.CalcExtendedTopochemicalAtom(mol)))
-        results.append(np.array(rd.CalcFragmentComplexity(mol)))
-        results.append(np.array(rd.CalcFramework(mol)))        
-        results.append(np.array(rd.CalcHydrogenBond(mol)))
+        # results.append(np.array(rd.CalcFragmentComplexity(mol)))
+        # results.append(np.array(rd.CalcFramework(mol)))
+        # results.append(np.array(rd.CalcHydrogenBond(mol)))
         if version==1:
             results.append(CalcIC(mol))
         else:
-            results.append(np.array(rd.CalcLogS(mol))) # added if version > 1!
+            # results.append(np.array(rd.CalcLogS(mol))) # added if version > 1!
             results.append(np.array(rd.CalcInformationContent(mol,5)))
 
         results.append(np.array(rd.CalcKappaShapeIndex(mol)))
         results.append(np.array(rd.CalcLipinski(mol)))
-        results.append(np.array(rd.CalcMcGowanVolume(mol)))
+        # results.append(np.array(rd.CalcMcGowanVolume(mol)))
         results.append(np.array(rd.CalcMoeType(mol)))
         results.append(np.array(rd.CalcMolecularDistanceEdge(mol)))
         results.append(np.array(rd.CalcMolecularId(mol)))
@@ -92,19 +68,19 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcTopoPSA(mol)))
         results.append(np.array(rd.CalcTopologicalCharge(mol)))
         results.append(np.array(rd.CalcTopologicalIndex(mol)))
-        results.append(np.array(rd.CalcVdwVolumeABC(mol)))
-        results.append(np.array(rd.CalcVertexAdjacencyInformation(mol)))
+        # results.append(np.array(rd.CalcVdwVolumeABC(mol)))
+        # results.append(np.array(rd.CalcVertexAdjacencyInformation(mol)))
         results.append(np.array(rd.CalcWalkCount(mol)))
         results.append(np.array(rd.CalcWeight(mol)))
         results.append(np.array(rd.CalcWienerIndex(mol)))
         results.append(np.array(rd.CalcZagrebIndex(mol)))
         if version>1:
         #  new descriptors added
-            results.append(np.array(rd.CalcPol(mol))) 
-            results.append(np.array(rd.CalcMR(mol))) 
+            # results.append(np.array(rd.CalcPol(mol))) 
+            # results.append(np.array(rd.CalcMR(mol))) 
             #results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
-            results.append(np.array(rd.CalcFlexibility(mol))) 
-            results.append(np.array(rd.CalcSchultz(mol))) 
+            # results.append(np.array(rd.CalcFlexibility(mol))) 
+            # results.append(np.array(rd.CalcSchultz(mol))) 
             results.append(np.array(rd.CalcAlphaKappaShapeIndex(mol))) 
             results.append(np.array(rd.CalcHEState(mol))) # very slightly slower
             results.append(np.array(rd.CalcBEState(mol))) # as a true impact
@@ -149,6 +125,8 @@ def Calculate(smiles_list, n_jobs=4,  version=1):
 
 
 if __name__ == "__main__":
+    print("cppmordred library contents:")
+    print(dir(rd))
     version = 2
     smiles = ['CCCO','CCCN','c1ccccc1']
     smiles_list = smiles
