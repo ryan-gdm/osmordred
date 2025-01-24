@@ -1,0 +1,9 @@
+.vscode
+__pycache__
+_skbuild
+dist
+
+MANIFEST.in
+.DS_Store
+*.csv
+*.egg-info

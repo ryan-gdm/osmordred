@@ -3,33 +3,9 @@ import numpy as np
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
-"""
-only for version 1
-try:
-    from src.common.chemistry.InformationContent import CalcIC
-except:
-    from InformationContent import CalcIC
-"""
 
-
-print('package import')
 import cppmordred as rd
-print(dir(rd))
 
-"""
-only for local built
-try:
-    print('local import')
-    import sys
-    sys.path.append('/Users/guillaume-osmo/Github/mordred-community/cpp/cppmordred/_skbuild/macosx-15.0-arm64-3.11/cmake-install')  # Ensure mordred_cpp is accessible
-    import cppmordred as rd
-    print(dir(rd))
-
-except:
-    print('package import')
-    import cppmordred as rd
-    print(dir(rd))
-"""
 
 # Define descriptor computation function
 def CalcMordredCPP(smiles, version=2):
@@ -44,7 +20,7 @@ def CalcMordredCPP(smiles, version=2):
         v = 2
         doExEstate = True
 
-    mol = Chem.MolFromSmiles(smiles)
+        mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None # Return an empty array instead of None
     results = []
@@ -70,7 +46,7 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcEccentricConnectivityIndex(mol)))
         results.append(np.array(rd.CalcExtendedTopochemicalAtom(mol)))
         results.append(np.array(rd.CalcFragmentComplexity(mol)))
-        results.append(np.array(rd.CalcFramework(mol)))        
+        results.append(np.array(rd.CalcFramework(mol)))
         results.append(np.array(rd.CalcHydrogenBond(mol)))
         if version==1:
             results.append(CalcIC(mol))
@@ -102,9 +78,9 @@ def CalcMordredCPP(smiles, version=2):
         #  new descriptors added
             results.append(np.array(rd.CalcPol(mol))) 
             results.append(np.array(rd.CalcMR(mol))) 
-            #results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
+            results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
             results.append(np.array(rd.CalcFlexibility(mol))) 
-            results.append(np.array(rd.CalcSchultz(mol))) 
+            results.append(np.array(rd.CalcSchultz(mol)))
             results.append(np.array(rd.CalcAlphaKappaShapeIndex(mol))) 
             results.append(np.array(rd.CalcHEState(mol))) # very slightly slower
             results.append(np.array(rd.CalcBEState(mol))) # as a true impact
@@ -115,7 +91,9 @@ def CalcMordredCPP(smiles, version=2):
             results.append(np.array(rd.CalcAZMat(mol)))
             results.append(np.array(rd.CalcDSMat(mol)))
             results.append(np.array(rd.CalcDN2Mat(mol)))
-
+            results.append(np.array(rd.CalcFrags(mol)))
+            results.append(np.array(rd.CalcAddFeatures(mol)))
+            
         results_to_concat = [np.atleast_1d(r) for r in results]
         return np.concatenate(results_to_concat)
     except Exception as e:
@@ -149,6 +127,8 @@ def Calculate(smiles_list, n_jobs=4,  version=1):
 
 
 if __name__ == "__main__":
+    print("cppmordred library contents:")
+    print(dir(rd))
     version = 2
     smiles = ['CCCO','CCCN','c1ccccc1']
     smiles_list = smiles
@@ -162,4 +142,18 @@ if __name__ == "__main__":
     
     print(f"Finished processing. Results shape: {df_results.shape}")
     df_results.to_csv('Myfeatures.csv', index=False)
+
+    # additional wrappers from double/int into std::vector of double
+    print(list(rd.CalcSchultz(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcPol(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcMR(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcODT(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcFlexibility(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcLogS(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcHydrogenBond(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcFramework(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcBertzCT(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcBalabanJ(Chem.MolFromSmiles(smiles[-1]))))
+
+    print(list(rd.CalcInformationContent(Chem.MolFromSmiles(smiles[0]),5)))
 
