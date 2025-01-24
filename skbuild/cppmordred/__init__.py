@@ -92,4 +92,7 @@ from ._cppmordred import (
     CalcDSMat,
     CalcDN2Mat,
     CalcInformationContent,
+    CalcFrags,
+    CalcAddFeatures,
+
 )

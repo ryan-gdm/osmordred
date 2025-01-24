@@ -32,9 +32,9 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcAtomCount(mol, v)))  #  add nHetero in v1.1
         results.append(np.array(rd.CalcAutocorrelation(mol)))
         results.append(np.array(rd.CalcBCUT(mol)))
-        # results.append(np.array(rd.CalcBalabanJ(mol)))
+        results.append(np.array(rd.CalcBalabanJ(mol)))
         results.append(np.array(rd.CalcBaryszMatrix(mol)))
-        # results.append(np.array(rd.CalcBertzCT(mol)))
+        results.append(np.array(rd.CalcBertzCT(mol)))
         results.append(np.array(rd.CalcBondCount(mol)))
         results.append(np.array(rd.CalcRNCGRPCG(mol))) # CPSA 2D descriptors on charges
         results.append(np.array(rd.CalcCarbonTypes(mol, v))) # add calcFractionCSP3 in v1.1
@@ -45,18 +45,18 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcEState(mol, doExEstate))) # no impact True/False
         results.append(np.array(rd.CalcEccentricConnectivityIndex(mol)))
         results.append(np.array(rd.CalcExtendedTopochemicalAtom(mol)))
-        # results.append(np.array(rd.CalcFragmentComplexity(mol)))
-        # results.append(np.array(rd.CalcFramework(mol)))
-        # results.append(np.array(rd.CalcHydrogenBond(mol)))
+        results.append(np.array(rd.CalcFragmentComplexity(mol)))
+        results.append(np.array(rd.CalcFramework(mol)))
+        results.append(np.array(rd.CalcHydrogenBond(mol)))
         if version==1:
             results.append(CalcIC(mol))
         else:
-            # results.append(np.array(rd.CalcLogS(mol))) # added if version > 1!
+            results.append(np.array(rd.CalcLogS(mol))) # added if version > 1!
             results.append(np.array(rd.CalcInformationContent(mol,5)))
 
         results.append(np.array(rd.CalcKappaShapeIndex(mol)))
         results.append(np.array(rd.CalcLipinski(mol)))
-        # results.append(np.array(rd.CalcMcGowanVolume(mol)))
+        results.append(np.array(rd.CalcMcGowanVolume(mol)))
         results.append(np.array(rd.CalcMoeType(mol)))
         results.append(np.array(rd.CalcMolecularDistanceEdge(mol)))
         results.append(np.array(rd.CalcMolecularId(mol)))
@@ -68,18 +68,18 @@ def CalcMordredCPP(smiles, version=2):
         results.append(np.array(rd.CalcTopoPSA(mol)))
         results.append(np.array(rd.CalcTopologicalCharge(mol)))
         results.append(np.array(rd.CalcTopologicalIndex(mol)))
-        # results.append(np.array(rd.CalcVdwVolumeABC(mol)))
-        # results.append(np.array(rd.CalcVertexAdjacencyInformation(mol)))
+        results.append(np.array(rd.CalcVdwVolumeABC(mol)))
+        results.append(np.array(rd.CalcVertexAdjacencyInformation(mol)))
         results.append(np.array(rd.CalcWalkCount(mol)))
         results.append(np.array(rd.CalcWeight(mol)))
         results.append(np.array(rd.CalcWienerIndex(mol)))
         results.append(np.array(rd.CalcZagrebIndex(mol)))
         if version>1:
         #  new descriptors added
-            # results.append(np.array(rd.CalcPol(mol))) 
-            # results.append(np.array(rd.CalcMR(mol))) 
-            #results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
-            # results.append(np.array(rd.CalcFlexibility(mol))) 
+            results.append(np.array(rd.CalcPol(mol))) 
+            results.append(np.array(rd.CalcMR(mol))) 
+            results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
+            results.append(np.array(rd.CalcFlexibility(mol))) 
             results.append(np.array(rd.CalcSchultz(mol)))
             results.append(np.array(rd.CalcAlphaKappaShapeIndex(mol))) 
             results.append(np.array(rd.CalcHEState(mol))) # very slightly slower
@@ -91,7 +91,9 @@ def CalcMordredCPP(smiles, version=2):
             results.append(np.array(rd.CalcAZMat(mol)))
             results.append(np.array(rd.CalcDSMat(mol)))
             results.append(np.array(rd.CalcDN2Mat(mol)))
-
+            results.append(np.array(rd.CalcFrags(mol)))
+            results.append(np.array(rd.CalcAddFeatures(mol)))
+            
         results_to_concat = [np.atleast_1d(r) for r in results]
         return np.concatenate(results_to_concat)
     except Exception as e:
@@ -140,4 +142,18 @@ if __name__ == "__main__":
     
     print(f"Finished processing. Results shape: {df_results.shape}")
     df_results.to_csv('Myfeatures.csv', index=False)
+
+    # additional wrappers from double/int into std::vector of double
+    print(list(rd.CalcSchultz(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcPol(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcMR(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcODT(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcFlexibility(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcLogS(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcHydrogenBond(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcFramework(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcBertzCT(Chem.MolFromSmiles(smiles[-1]))))
+    print(list(rd.CalcBalabanJ(Chem.MolFromSmiles(smiles[-1]))))
+
+    print(list(rd.CalcInformationContent(Chem.MolFromSmiles(smiles[0]),5)))
 

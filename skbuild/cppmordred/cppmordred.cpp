@@ -60,6 +60,10 @@ namespace std {
 
 namespace RDKit {
 
+
+
+
+
     static const std::vector<std::string> acidicSMARTS = {
         "[O;H1]-[C,S,P]=O", 
         "[*;-;!$(*~[*;+])]", 
@@ -116,6 +120,144 @@ namespace RDKit {
         }
         return count;
     }
+
+
+
+// additional features
+
+
+// Function to count the number of endocyclic single bonds
+int calcEndocyclicSingleBonds(const RDKit::ROMol &mol) {
+    const RDKit::RingInfo *ri = mol.getRingInfo();
+    if (!ri || !ri->isInitialized()) {
+        return 0;  // No ring information available
+    }
+
+    std::unordered_set<int> bondIndices;
+
+    // Collect all bond indices involved in rings
+    for (unsigned int i = 0; i < mol.getNumBonds(); ++i) {
+        if (ri->numBondRings(i) > 0) {  // Check if the bond is part of a ring
+            bondIndices.insert(i);
+        }
+    }
+
+    int nbonds = 0;
+    for (const auto &bondIdx : bondIndices) {
+        const RDKit::Bond *bond = mol.getBondWithIdx(bondIdx);
+        if (bond->getBondType() == RDKit::Bond::SINGLE) {
+            nbonds++;
+        }
+    }
+
+    return nbonds;
+}
+
+
+    static const std::vector<std::string> alcoholsSMARTS = {
+        "[#6;H2;!$(C=O)][OX2H]", 
+        "[#6;H1;!$(C=O)][OX2H]", 
+        "[#6;H0;!$(C=O)][OX2H]", 
+    };
+
+
+ // Precompile SMARTS patterns for efficiency
+    static const std::vector<std::shared_ptr<RDKit::RWMol>> compiledalcoholsSMARTS = [] {
+        std::vector<std::shared_ptr<RDKit::RWMol>> res;
+        for (const auto& smarts : alcoholsSMARTS) {
+            auto mol = RDKit::SmartsToMol(smarts);
+            if (mol) {
+                res.emplace_back(std::shared_ptr<RDKit::RWMol>(mol));
+            } else {
+                std::cerr << "Invalid SMARTS: " << smarts << std::endl;
+            }
+        }
+        return res;
+    }();
+
+
+// Function to count primary, secondary, and tertiary hydroxyl groups
+std::vector<int> countHydroxylGroups(const RDKit::ROMol &mol) {
+    std::vector<int> results(3, 0);
+
+    for (size_t i = 0; i < compiledalcoholsSMARTS.size(); ++i) {
+        std::vector<RDKit::MatchVectType> matches;
+        RDKit::SubstructMatch(mol, *compiledalcoholsSMARTS[i], matches);
+        results[i] = matches.size();
+    }
+
+    return results;
+}
+
+
+// Define static SMARTS patterns for bridged bonds, polyacids, and polyalcohols
+static const std::vector<std::string> smartsPatterns = {
+    "[*x3,*x4,*x5,*x6]",            // Bridged bonds
+    "[CX3](=O)[OX1H0-,OX2H1]",       // Polyacid
+    "[#6;!$(C=O)][OX2H]"             // Polyalcohol
+};
+
+// Precompile SMARTS patterns for efficiency
+static const std::vector<std::shared_ptr<RDKit::RWMol>> compiledSMARTS = [] {
+    std::vector<std::shared_ptr<RDKit::RWMol>> res;
+    for (const auto& smarts : smartsPatterns) {
+        auto mol = RDKit::SmartsToMol(smarts);
+        if (mol) {
+            res.emplace_back(std::shared_ptr<RDKit::RWMol>(mol));
+        } else {
+            std::cerr << "Invalid SMARTS: " << smarts << std::endl;
+        }
+    }
+    return res;
+}();
+
+// Function to count the number of bridged bonds
+int countBridgedBonds(const RDKit::ROMol &mol) {
+    int nBridgeheads = RDKit::Descriptors::calcNumBridgeheadAtoms(mol);
+    if (nBridgeheads > 0) {
+        std::vector<RDKit::MatchVectType> matches;
+        int nbonds = 0;
+
+        if (RDKit::SubstructMatch(mol, *compiledSMARTS[0], matches)) {  // Use precompiled pattern for bridged bonds
+            for (const auto &match : matches) {
+                for (const auto &atom : match) {
+                    nbonds += std::distance(mol.getAtomNeighbors(mol.getAtomWithIdx(atom.second)).first,
+                                            mol.getAtomNeighbors(mol.getAtomWithIdx(atom.second)).second);
+                }
+            }
+        }
+        return nbonds;
+    }
+    return 0;
+}
+
+// Function to check if a molecule is a polyacid
+bool isPolyAcid(const RDKit::ROMol &mol) {
+    return RDKit::SubstructMatch(mol, *compiledSMARTS[1]).size() > 1;  // Use precompiled pattern for polyacid
+}
+
+// Function to check if a molecule is a polyalcohol
+bool isPolyAlcohol(const RDKit::ROMol &mol) {
+    return RDKit::SubstructMatch(mol, *compiledSMARTS[2]).size() > 1;  // Use precompiled pattern for polyalcohol
+}
+
+
+
+std::vector<double> calcAddFeatures(const RDKit::ROMol& mol) {
+        std::vector<double> v(7,0.);
+        auto hydroxylCounts = countHydroxylGroups(mol);
+        v[0] = hydroxylCounts[0];
+        v[1] = hydroxylCounts[1];
+        v[2] = hydroxylCounts[2];
+        v[3] = static_cast<double>(countBridgedBonds(mol));
+        v[4] = static_cast<double>(isPolyAcid(mol));
+        v[5] = static_cast<double>(isPolyAlcohol(mol));
+        v[6] = static_cast<double>(calcEndocyclicSingleBonds(mol));
+
+    return v;
+}
+
+
 
     // Function to calculate the number of acidic groups in a molecule
     int calcAcidicGroupCount(const ROMol& mol) {
@@ -294,6 +436,14 @@ namespace RDKit {
         return J;
     }
 
+
+ std::vector<double> calcBalabanJ(const ROMol& mol) {
+    
+    std::vector<double> res(1,0.);
+    res[0] = BalabanJ(mol);
+    return res;
+
+ }
 
 
     // bertyCT related functions (InfoGain can be found in rdkit ML/InfoGainFuncs part, but I have to change to input for matching python code)
@@ -570,6 +720,14 @@ namespace RDKit {
         return CalculateEntropies(connectionDict, atomTypeDict, numAtoms);
     }
 
+    std::vector<double> calcBertzCT(const RDKit::ROMol& mol) {
+        std::vector<double> res(1,0.);
+        res[0] = BertzCT(mol);
+        return res;
+    }
+
+
+
     // bondCount
 
 
@@ -640,6 +798,10 @@ namespace RDKit {
 
         return bondCounts;
     }
+
+
+
+
 
     // CarbonTypes there is an issue in the code not sure why this is not the same as in python code!
     // TODO: need debug
@@ -724,8 +886,10 @@ namespace RDKit {
 
 
 
+
+
     // VertexAdjacencyInformation
-    double calcVertexAdjInfo(const RDKit::ROMol &mol)  {
+    double VertexAdjacencyInformation(const RDKit::ROMol &mol)  {
         int m = 0;
 
         // Count the number of heavy-heavy bonds
@@ -741,6 +905,14 @@ namespace RDKit {
     
         // Calculate the descriptor value
         return 1.0 + std::log2(static_cast<double>(m));
+    }
+
+
+
+
+    std::vector<double> calcVertexAdjacencyInformation(const ROMol &mol) {
+        std::vector<double> res(VertexAdjacencyInformation(mol));
+        return res;
     }
 
 
@@ -1039,7 +1211,7 @@ namespace RDKit {
 
     // VdwVolumeABC
     // working "Need Hs explicit!"
-    double calcVdwVolumeABC(const ROMol &mol) {
+    double VdwVolumeABC(const ROMol &mol) {
 
                 
         std::unique_ptr<RDKit::ROMol> hmol(RDKit::MolOps::addHs(mol));
@@ -1068,6 +1240,13 @@ namespace RDKit {
         return ac - 5.92 * Nb - 14.7 * NRa - 3.8 * NRA;
     }
 
+
+
+    std::vector<double> calcVdwVolumeABC(const ROMol &mol) {
+        std::vector<double> res(VdwVolumeABC(mol));
+        return res;
+    }
+
     // TopoPSA (adding S & P atoms effect to rdkit version!)
     // working for my molecules but need a S, P molecules to check ...
     // Helper function to calculate hydrogen count
@@ -1093,6 +1272,8 @@ namespace RDKit {
         }
         return bondCounts;
     }
+
+
 
     // Function to calculate the phosphorus contribution to TPSA
     double getPhosphorusContribution(const Atom* atom) {
@@ -1190,15 +1371,15 @@ namespace RDKit {
 
 
     // HygrogenBond from Rdkit code
-    std::vector<int> calcHydrogenBond(const ROMol& mol) {
-        std::vector<int> res(2, 0);
+    std::vector<double> calcHydrogenBond(const ROMol& mol) {
+        std::vector<double> res(2, 0.);
 
         int nHBAcc = RDKit::Descriptors::calcNumHBA(mol);
 
 
         int nHBDon =  RDKit::Descriptors::calcNumHBD(mol);
-        res[0] = nHBAcc;
-        res[1] = nHBDon;
+        res[0] = static_cast<double>(nHBAcc);
+        res[1] = static_cast<double>(nHBDon);
 
         return res;
     }
@@ -1576,7 +1757,7 @@ namespace RDKit {
     }();
 
     // Function to calculate LogS descriptor
-    double calcLogS(const RDKit::ROMol& mol) {
+    double LogS(const RDKit::ROMol& mol) {
         // Base formula contribution
         double molWeight = RDKit::Descriptors::calcAMW(mol, false); // Get molecular weight
         double logS = 0.89823 - 0.10369 * std::sqrt(molWeight);
@@ -1599,6 +1780,13 @@ namespace RDKit {
         }
 
         return logS;
+    }
+
+
+    std::vector<double> calcLogS(const RDKit::ROMol& mol) {
+        std::vector<double> res(1,0.);
+        res[0] = LogS(mol);
+        return res;
     }
 
     // Function to calculate Lipinski rule of 5
@@ -1770,7 +1958,7 @@ namespace RDKit {
         
     
 
-    double calcMcGowanVolume(const RDKit::ROMol &mol) {
+    double McGowanVolume(const RDKit::ROMol &mol) {
         // In Padel code this is /100 in order to match the Polarisability equation
         double res = 0.;
         std::unique_ptr<RDKit::ROMol> hmol(RDKit::MolOps::addHs(mol));
@@ -1790,7 +1978,10 @@ namespace RDKit {
         return  finalres;
     }
 
-
+  std::vector<double> calcMcGowanVolume(const RDKit::ROMol &mol) {
+   std::vector<double> res(McGowanVolume(mol));
+    return res;
+ }
 
 
     // SMARTS patterns for fragments
@@ -1831,7 +2022,7 @@ namespace RDKit {
     }
 
     // Function to calculate polarity descriptor
-    double calcPol(const RDKit::ROMol &mol) {
+    double Polarity(const RDKit::ROMol &mol) {
         double res = -1.529;  // Intercept value
 
         // Add contributions from precompiled SMARTS patterns
@@ -1850,17 +2041,46 @@ namespace RDKit {
         return res;
     }
 
- double calcMR(const RDKit::ROMol &mol) {
 
-        return 4./3. * M_PI* calcPol(mol);
- }
+    std::vector<double> calcPol(const RDKit::ROMol &mol) {
 
-double calcODT(const RDKit::ROMol &mol) {
-    return 1;
-}
+        std::vector<double> res(1,0.);
+        res[0] = Polarity(mol);
+        return res;
+
+
+    }
+
+     double MRvalue(const RDKit::ROMol &mol) {
+
+            return 4./3. * M_PI* Polarity(mol);
+     }
+
+
+    std::vector<double> calcMR(const RDKit::ROMol &mol) {
+        std::vector<double> res(1,0.);
+        res[0] =  MRvalue(mol);
+        return res;
+
+    }
+
+
+    double ODT(const RDKit::ROMol &mol) {
+        return 1;
+    }
+
+
+    std::vector<double> calcODT(const RDKit::ROMol &mol) {
+        std::vector<double> res(1,0.);
+        res[0] = ODT(mol);
+        return res;
+
+
+    }
+
 
 // Function to calculate the Schultz descriptor
-double calcSchultz(const ROMol &mol) {
+double Schultz(const ROMol &mol) {
     // Get the number of atoms in the molecule
     int nAtoms = mol.getNumAtoms();
     if (nAtoms == 0) return 0.0;
@@ -1890,9 +2110,9 @@ double calcSchultz(const ROMol &mol) {
 
     return schultz;
 }
-std::vector<double> calcSchultzWrapper(const RDKit::ROMol &mol) {
+std::vector<double> calcSchultz(const RDKit::ROMol &mol) {
     std::vector<double> res(1,0.);
-    res[0] = calcSchultz(mol);;
+    res[0] = Schultz(mol);
     return res;
 }
 
@@ -2005,7 +2225,7 @@ std::vector<double> calcSchultzWrapper(const RDKit::ROMol &mol) {
         return res;
     }
 
-    double calcFragmentComplexity(const ROMol& mol) {
+    double FragmentComplexity(const ROMol& mol) {
         // Number of atoms (A)
         int A = mol.getNumAtoms();
 
@@ -2024,6 +2244,12 @@ std::vector<double> calcSchultzWrapper(const RDKit::ROMol &mol) {
         double fragCpx = std::abs(std::pow(B, 2) - std::pow(A, 2) + A) + H / 100.0;
 
         return fragCpx;
+    }
+
+
+    std::vector<double> calcFragmentComplexity(const ROMol& mol) {
+        std::vector<double> res(FragmentComplexity(mol));
+        return res;
     }
 
     // optimize construction of symetrics matrix only do j=i not j=0! Upper mat
@@ -3909,14 +4135,23 @@ std::vector<double> calcPathCount(const RDKit::ROMol& mol) {
     }
 
 
-double calcFlexibility(const RDKit::ROMol &mol) {
+    double Flexibility(const RDKit::ROMol &mol) {
 
-    double AK1 = calcalphaKappa1(mol);
-    double AK2 = calcalphaKappa2(mol);
-    int numHeavyAtom =  mol.getNumHeavyAtoms();
-    return AK1*AK2/static_cast<double>(numHeavyAtom);
+        double AK1 = calcalphaKappa1(mol);
+        double AK2 = calcalphaKappa2(mol);
+        int numHeavyAtom =  mol.getNumHeavyAtoms();
+        return AK1*AK2/static_cast<double>(numHeavyAtom);
 
-}
+    }
+
+
+    std::vector<double> calcFlexibility(const RDKit::ROMol &mol) {
+        std::vector<double> res(1,0.);
+        res[0] = Flexibility(mol);
+        return res;
+
+
+    }
 
 
     std::vector<double> calcAlphaKappaShapeIndex(const RDKit::ROMol& mol) {
@@ -7272,7 +7507,7 @@ std::vector<double> calcBCUTs(const RDKit::ROMol& mol) {
     }
 
     // Function to calculate the FMF ratio
-    double calcFmF(const ROMol& mol) {
+    double Framework(const ROMol& mol) {
         const RingInfo* ringInfo = mol.getRingInfo();
         std::unordered_set<int> ringAtoms;
 
@@ -7299,6 +7534,13 @@ std::vector<double> calcBCUTs(const RDKit::ROMol& mol) {
 
         return FMF;
     }
+
+
+     std::vector<double> calcFramework(const ROMol& mol) {
+        std::vector<double> res(1,0.);
+        res[0] = Framework(mol);
+        return res;
+     } 
 
 
    std::unordered_set<std::string> organicbondkeys = {"7-S-7","9-S-7","11-S-7","13-S-7","15-S-7","16-S-7","17-S-7","19-S-7","20-S-7","21-S-7","22-S-7","24-S-7",
@@ -7739,7 +7981,7 @@ std::vector<double> calcBCUTs(const RDKit::ROMol& mol) {
     }
 
     // Main pipeline
-    std::map<int, std::vector<std::vector<int>>>  computePipeline(RDKit::RWMol& mol, int maxRadius) {
+    std::map<int, std::vector<std::vector<int>>>  computePipeline(RDKit::RWMol& mol, int maxRadius, bool addDeadKeys = false) {
         int nAtoms = mol.getNumAtoms();
 
         if (nAtoms == 0) {
@@ -7879,6 +8121,17 @@ std::vector<double> calcBCUTs(const RDKit::ROMol& mol) {
                         }
                     }
 
+
+                    if (neighbors.empty()) {
+                        if (SP[atomIdx][r] == -1) {
+                            SP[atomIdx][r] = -2;  // Mark as exhausted
+                        }
+                        // Add dead key if enabled
+                        if (addDeadKeys) {
+                            eqKeys.push_back(-2);
+                        }
+                    }
+
                     std::sort(eqKeys.begin(), eqKeys.end());
                     clusterKeys.emplace_back(atomIdx, eqKeys);
 
@@ -7892,11 +8145,12 @@ std::vector<double> calcBCUTs(const RDKit::ROMol& mol) {
                                 M[atomIdx][freeSlot] = neighbors[i];
                             }
                         }
-                    } else {
-                        if (SP[atomIdx][r] == -1) {
-                            SP[atomIdx][r] = -2;  // Mark as exhausted, no further expansion
-                        }
-                    }
+                    } 
+                    //else {
+                    //    if (SP[atomIdx][r] == -1) {
+                    //        SP[atomIdx][r] = -2;  // Mark as exhausted, no further expansion
+                    //    }
+                    //}
                 }
 
                 auto subClusters = updateClustersWithKeys(clusterKeys);
@@ -9328,6 +9582,91 @@ std::vector<double> calcDN2Z(const RDKit::ROMol &mol) {
 
 
 
+
+    static const std::vector<std::string> frags = {
+        "[CX4H3]","[CX4H2]","[CX4H1]","[CX4H0]","*=[CX3H2]","[$(*=[CX3H1]),$([cX3H1](a)a)]","[$(*=[CX3H0]),$([cX3H0](a)(a)A)]","c(a)(a)a","*#C","[C][NX3;H2]","[c][NX3;H2]","[C][NX3;H1][C]",
+        "[c][NX3;H1]","[c][nX3;H1][c]","[C][NX3;H0](C)[C]","[c][NX3;H0](C)[C]","[c][nX3;H0][c]","*=[Nv3;!R]","*=[Nv3;R]",
+        "[nX2H0,nX3H1+](a)a","N#C[A;!#1]","N#C[a;!#1]","[$([A;!#1][NX3](=O)=O),$([A;!#1][NX3+](=O)[O-])]",
+        "[$([a;!#1][NX3](=O)=O),$([a;!#1][NX3+](=O)[O-])]","[$([NX3](=[OX1])(=[OX1])O),$([NX3+]([OX1-])(=[OX1])O)]","[OH]","[OX2;H0;!R]","[OX2;H0;R]","[oX2](a)a",
+        "*=O","[SX2](*)*","[sX2](a)a","*=[SX1]","*=[SX3]","[$([#16X4](=[OX1])(=[OX1])([!#8])[OX2H0]),$([#16X4+2]([OX1-])([OX1-])([!#8])[OX2H0])]","[S,s]",
+        "[P,p]","FA","Fa","Cl","Br","I","[CX3;!R](=[OX1])[OX2H0]","[CX3;R](=[OX1])[OX2H0;R]","P(=[OX1])(O)(O)O","[CX3](=[OX1])([OX2H0])[OX2H0]","[CX3](=O)[OX1H0-,OX2H1]",
+        "nC=[OX1]","[N;!R]C=[OX1]","[N;R][C;R]=[OX1]","[$([SX4](=[OX1])(=[OX1])([!O])[NX3]),$([SX4+2]([OX1-])([OX1-])([!O])[NX3])]","NC(=[OX1])N","[NX3,NX4+][CX3](=[OX1])[OX2,OX1-]","[CX3](=[OX1])[NX3][CX3](=[OX1])",
+        "C1(=[OX1])C=CC(=[OX1])C=C1","[$([CX4]([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])[F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])]",
+        "[CX4]([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])[CX4][F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)]","*1~*2~*(~*3~*(~*~*~*~*3)~*1)~*~*~*1~*2~*~*~*1",
+        "[OX2;H1]CC[O,N]","[OX2;H1]C[C,N]=[O,S]","[OX2;H1]c1ccccc1[O,NX3]","[OX2;H1]c1ccccc1C=[O,S]","[OX2;H1]c1ccccc1[$([NX3](=O)=O),$([NX3+](=O)[O-])]","[NH,NH2,NH3+]CC[O,N]","[NH,NH2,NH3+]c1ccccc1[O,N]",
+        "[NH,NH2,NH3+]c1ccccc1[C,N]=[O,S]","[OX2H]c1ccccc1[Cl,Br,I]","[CX4]([OH])[CX4][OH]","n:n","o:n","n:c:n","o:c:n","n:c:c:n","[F,Cl,Br,I,N,O,S]-c:c-[F,Cl,Br,I,N,O,S]","[F,Cl,Br,I,N,O,S]-c:c:c-[F,Cl,Br,I,N,O,S]",
+        "[F,Cl,Br,I,N,O,S]-c:c:c:c-[F,Cl,Br,I,N,O,S]","P(=[OX1])N","Nc:n","[$(cC[OH]);!$(c[CX3](=O)[OX1H0-,OX2H1])]","[$([#7+][OX1-]),$([#7v5]=[OX1]);!$([#7](~[O])~[O]);!$([#7]=[#7])]",
+        "[OX2]-c:c-[OX2]","[C][OX2H]","[c][OX2H]","[C][NX3;H1;!R][C]","[C][NX3;H1;R][C]","[c][NX3;H1;!$(NC=O)][C]","[CX3](=[OX1])[NX3H2]","[CX3](=[OX1])[NX3;H1][C]","[CX3](=[OX1])[NX3;H1][c]",
+        "[$([SX4](=[OX1])(=[OX1])([!O])[NH,NH2,NH3+]),$([SX4+2]([OX1-])([OX1-])([!O])[NH,NH2,NH3+])]","[NX3;H1]C(=[OX1])[NX3;H1]","[NX3;H0]C(=[OX1])[NX3;H1]","[NX3;H1]C(=[OX1])O","[NX3;H1]C(=N)[NX3;H0]",
+        "[C]#[CH]","P[OH,O-]","[CH][F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)]",
+        "[CH]([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])[F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)]","[CX4]([CX3](=O)[OX1H0-,OX2H1])[CX4][CX3](=O)[OX1H0-,OX2H1]"
+        "[CX4]([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])[CX3](=O)[OX1H0-,OX2H1]","[CX4]([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])[OH]",
+        "[CX4]([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])[CX4][OH]","[nX3;H1]:n","[nX3;H1]:c:n","[OX1]=[C,c]~[C,c]C[OH]","[OH]c1cccc2cccnc12",
+        "[OH]c1cc([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])ccc1","[OH]c1ccc([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])cc1",
+        "[NH,NH2,NH3+]c1cc([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])ccc1","[NH,NH2,NH3+]c1ccc([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])cc1",
+        "[CX3](=O)([OX1H0-,OX2H1])c1cc([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])ccc1","[CX3](=O)([OX1H0-,OX2H1])c1ccc([F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])cc1",
+        "[OH]c1c([CX4])cccc1[CX4]","[NH,NH2,NH3+]c1c([CX4])cccc1[CX4]","[OH]c1c(C[F,Cl,Br,I,$([NX3](=O)=O),$([NX3+](=O)[O-]),$(C#N),$([CX4](F)(F)F)])cccc1","[OH]c1cc([CX3](=O)[OX1H0-,OX2H1])ccc1",
+        "[OH]c1ccc([CX3](=O)[OX1H0-,OX2H1])cc1","[OH]c1cc([$([CH](=O)),$(C(=O)C)])ccc1","[OH]c1ccc([$([CH](=O)),$(C(=O)C)])cc1","[OX2H0+0]-[cX3H0;$(*-A)]:[cX3H0;$(*-a)]-[cX3H0;$(*-a)]:[cX3H1]:[cX3H1]",
+        "[CX4H3]-[nX3H0+0;$(*-A)]","[FX1H0]-[CX4H1](-[nX3H0+0;$(*-A)]1:[cX3H0;$(*-A)](-[CX4H3]):[nX2H0+0;!$(*-a);!$(*~A)]:[nX3H0+0;$(*-a)](:[cX3H0;$(*=A)]:1=[OX1H0+0])-[cX3H0;$(*-a)]1:[cX3H1]:[cX3H0;$(*-A)](:[cX3H0;$(*-A)]:[cX3H1]:[cX3H0;$(*-A)]:1-[ClX1H0])-[NX3H1+0]-[SX4H0](=[OX1H0+0])(=[OX1H0+0])-[CX4H3])-[FX1H0]",
+        "[cX3H1]:[cX3H1]:[cX3H1]:[cX3H0;$(*-A)]-[CX3H1]=[CX3H1]-[CX2H0]#[NX1H0+0]","[OX2H1+0]-[cX3H0;$(*-A)](:[cX3H1]):[cX3H1]","[CX4H3]-[cX3H0;$(*-A)]:[cX3H0;$(*-A)]","[CX4H3]-[cX3H0;$(*-A)]:[cX3H0;!$(*-a);!$(*~A)]:[cX3H0;!$(*-a);!$(*~A)]",
+        "[CX4H3]-[OX2H0+0]-[cX3H0;$(*-A)]","[CX4H2]-[SX2H0]","[CX4H2]-[CX4H3]","[cX3H1]:[cX3H1]:[cX3H0;!$(*-a);!$(*~A)](:[cX3H0;!$(*-a);!$(*~A)]):[cX3H0;!$(*-a);!$(*~A)]","[cX3H0;!$(*-a);!$(*~A)]:[cX3H0;!$(*-a);!$(*~A)]:[cX3H1]:[cX3H0;!$(*-a);!$(*~A)]:[cX3H0;!$(*-a);!$(*~A)]:[cX3H1]:[cX3H1]",
+        "[nX2H0+0;!$(*-a);!$(*~A)]:[nX3H0+0;$(*-A)]","[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:[nX2H0+0;!$(*-a);!$(*~A)]","[CX4H3]-[SX2H0]","[CX4H3]-[NX3H0+0]-[CX4H3]","[CX4H2]-[CX4H2]-[cX3H0;$(*-A)]",
+        "[cX3H1]:[cX3H0;$(*-A)]-[CX2H0]#[NX1H0+0]","[OX2H0+0]-[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:[cX3H1]:[cX3H1]","[CX4H1]-[CX4H2]","[CX4H1]-[cX3H0;$(*-A)]","[cX3H1]:[cX3H0;$(*-A)]:[nX2H0+0;!$(*-a);!$(*~A)]","[cX3H1]:[cX3H1]:[cX3H0;$(*-A)]-[CX3H0]=[OX1H0+0]",
+        "[NX3H1+0]-[CX3H0]=[OX1H0+0]","[FX1H0]-[CX4H0](-[FX1H0])-[FX1H0]","[cX3H1]:[cX3H0;$(*-a)](:[cX3H1])-[cX3H0;$(*-a)](:[cX3H1]):[cX3H1]","[NX3H1+0]-[cX3H0;$(*-A)](:[cX3H1]):[cX3H1]","[cX3H1]:[cX3H1]:[cX3H0;$(*-A)]-[NX3H0+0](=[OX1H0+0])=[OX1H0+0]",
+        "[CX4H3]-[cX3H0;$(*-A)]:[cX3H1]:[cX3H1]:[cX3H1]","[CX4H3]-[CX4H0]-[CX4H3]","[CX4H1]-[CX4H1]","[CX4H2]-[CX3H0](=[OX1H0+0])-[NX3H0+0]","[NX3H0+0]-[cX3H0;$(*-A)](:[cX3H0;$(*-A)]):[cX3H0;$(*-A)]","[OX2H1+0]-[cX3H0;$(*-A)](:[cX3H1]):[cX3H0;$(*-A)]-[ClX1H0]","[CX4H2]-[OX2H0+0]-[CX3H0]=[OX1H0+0]",
+        "[CX4H3]-[OX2H0+0]-[PX4H0](=[SX1H0])-[OX2H0+0]-[CX4H3]","[OX2H0+0]-[CX3H0](=[OX1H0+0])-[cX3H0;$(*-A)]:[cX3H0;$(*-A)]","[NX3H0+0]-[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:[cX3H1]:[cX3H0;$(*-A)]","[cX3H0;$(*-A)]:[cX3H1]:[cX3H0;$(*-A)]:[cX3H1]:[cX3H0;$(*-A)]",
+        "[CX4H2]-[cX3H0;$(*-A)]:[cX3H1]:[cX3H0;$(*-A)]","[CX4H0]-[CX4H0]-[ClX1H0]","[cX3H0;$(*-A)]1:[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:[cX3H0;$(*-A)]:1","[A!#1x0+0]#[A!#1x0+0]","[SX2H0]","[ax3+0;$(*-[A!#1])]","[NX3H0+0]","[CX3H1]=[CX3H2]","[CX3H1]=[OX1H0+0]","[cX3H0;$(*-A)]",
+        "[ax3+0;$(*-a)]","[nX3H1+0]","[OX2H0+0]","[A!#1x0+0]","[#8]","[cX3H0;!$(*-a);!$(*~A)]","[#7]","[#6]","[SX2H1]","[CX3](=O)[OX2H1]","[$([CX3H][#6]),$([CX3H2])]=[OX1]","[CX3;$([R0][#6]),$([H1R0])](=[OX1])[OX2][#6;!$(C=[O,N,S])]",
+        "[CX3;$([H2]),$([H1][#6]),$(C([#6])[#6])]=[CX3;$([H2]),$([H1][#6]),$(C([#6])[#6])]","[CX4](F)(F)F","[NX3]=[CX3]","[NX3][CX3]=[NX3]","[NX1]#[CX2]","[CX3]=[OX1]","[#6][CX3](=O)[#6]","[CX3H1](=O)[#6]","[NX3][CX3](=[OX1])[#6]",
+        "[NX3][CX3](=[OX1])[#5]","[NX3][CX3](=[OX1])[OX2H0]","[NX3,NX4+][CX3](=[OX1])[OX2H,OX1-]","[#6][CX3](=[OX1])[OX2H0][#6]","[CX3](=[OX1])[OX1-]","[CX3](=O)[OX2H1]","[OX1]=[CX3]([OX2])[OX2]","[CX3]=[SX1]","[NX3][NX3]","[NX2]=N",
+        "[NX2]=[OX1]","[$([NX3](=O)=O),$([NX3+](=O)[O-])][!#8]","[OX1]=[NX2][OX2]","[OX2,OX1-][OX2,OX1-]","[$([#16X3](=[OX1])([#6])[#6]),$([#16X3+]([OX1-])([#6])[#6])]","[$([#16X4](=[OX1])(=[OX1])([#6])[#6]),$([#16X4+2]([OX1-])([OX1-])([#6])[#6])]",
+        "[$([SX4](=[OX1])(=[OX1])([!O])[NX3]),$([SX4+2]([OX1-])([OX1-])([!O])[NX3])]","[$([#16X3](=[OX1])[OX2H0]),$([#16X3+]([OX1-])[OX2H0])]","[$([#16X3](=[OX1])[OX2H,OX1H0-]),$([#16X3+]([OX1-])[OX2H,OX1H0-])]",
+        "[$([#16X4](=[OX1])(=[OX1])([#6])[OX2H0]),$([#16X4+2]([OX1-])([OX1-])([#6])[OX2H0])]","[$([#16X4](=[OX1])(=[OX1])([#6])[OX2H,OX1H0-]),$([#16X4+2]([OX1-])([OX1-])([#6])[OX2H,OX1H0-])]",
+        "[$([#16X4](=[OX1])(=[OX1])([OX2H,OX1H0-])[OX2][#6]),$([#16X4+2]([OX1-])([OX1-])([OX2H,OX1H0-])[OX2][#6])]","[$([SX4](=O)(=O)(O)O),$([SX4+2]([O-])([O-])(O)O)]","[#16X2H0][#16X2H0]","[PX5](=[OX1])([OX1-])[OX1-]",
+        "[PX5](=[OX1])([OX2H])[OX2H]","[PX6](=[OX1])([OX1-])([OX1-])[OX1-]"};
+
+
+
+    static const std::vector<std::shared_ptr<RDKit::RWMol>> queriesFrags = [] {
+        std::vector<std::shared_ptr<RDKit::RWMol>> res;
+        for (const auto& smi : frags) {
+            auto mol = RDKit::SmartsToMol(smi);
+            if (mol) {
+                res.emplace_back(std::move(mol));
+            } else {
+                std::cerr << "Invalid SMARTS: " << smi << std::endl;
+            }
+        }
+        return res;
+    }();
+
+
+
+    std::vector<double> calcFrags(const RDKit::ROMol& mol) {
+        std::vector<double> retval(queriesFrags.size(), 0.0);  
+
+        try {
+            // Calculate A descriptor
+            for (size_t i = 0; i < queriesFrags.size(); ++i) {
+
+                std::vector<RDKit::MatchVectType> matches;
+                RDKit::SubstructMatch(mol, *queriesFrags[i], matches, true);  // uniquify = true
+                retval[i] = matches.size();
+            }
+
+
+        } catch (const std::exception& e) {
+            std::cerr << "Error in SMARTS matching: " << e.what() << std::endl;
+            throw std::runtime_error("Error in SMARTSQueryTool");
+        }
+
+        return retval;
+    }
+
+
+
+
+
 } // end rdkit namespace
 
 
@@ -9338,10 +9677,10 @@ BOOST_PYTHON_MODULE(_cppmordred) {
   boost::python::def("CalcAcidBase", RDKit::calcAcidBase);
   boost::python::def("CalcAromatic", RDKit::calcAromatic);
   boost::python::def("CalcAtomCount", RDKit::calcAtomCounts);
-  boost::python::def("CalcBalabanJ", RDKit::BalabanJ);
-  boost::python::def("CalcBertzCT", RDKit::BertzCT);
+  boost::python::def("CalcBalabanJ", RDKit::calcBalabanJ);
+  boost::python::def("CalcBertzCT", RDKit::calcBertzCT);
   boost::python::def("CalcBondCount", RDKit::calcBondCounts);
-  boost::python::def("CalcVertexAdjacencyInformation", RDKit::calcVertexAdjInfo);
+  boost::python::def("CalcVertexAdjacencyInformation", RDKit::calcVertexAdjacencyInformation);
   boost::python::def("CalcWeight", RDKit::calcWeight);
   boost::python::def("CalcWienerIndex", RDKit::calcWienerIndex);
   boost::python::def("CalcVdwVolumeABC", RDKit::calcVdwVolumeABC); 
@@ -9398,7 +9737,7 @@ BOOST_PYTHON_MODULE(_cppmordred) {
   boost::python::def("CalcAutocorrelation", RDKit::calcAutoCorrelation); 
   //boost::python::def("CalcAutocorrelationEigen", RDKit::calcAutoCorrelationEigen); 
 
-  boost::python::def("CalcFramework", RDKit::calcFmF); 
+  boost::python::def("CalcFramework", RDKit::calcFramework); 
   boost::python::def("CalcExtendedTopochemicalAtom", RDKit::calcExtendedTopochemicalAtom); 
   boost::python::def("CalcExtendedTopochemicalAtom2", RDKit::calculateETADescriptors); 
 
@@ -9431,7 +9770,7 @@ BOOST_PYTHON_MODULE(_cppmordred) {
   boost::python::def("CalcMR", RDKit::calcMR); 
   boost::python::def("CalcFlexibility", RDKit::calcFlexibility); 
   boost::python::def("CalcODT", RDKit::calcODT); 
-  boost::python::def("CalcSchultz", RDKit::calcSchultzWrapper);
+  boost::python::def("CalcSchultz", RDKit::calcSchultz);
   boost::python::def("CalcRNCGRPCG", RDKit::calcRNCG_RPCG); 
   boost::python::def("CalcAZV", RDKit::calcAZV); 
   boost::python::def("CalcASV", RDKit::calcASV); 
@@ -9459,11 +9798,16 @@ BOOST_PYTHON_MODULE(_cppmordred) {
   boost::python::def("CalcASMat", RDKit::calcASMat); 
   boost::python::def("CalcDSMat", RDKit::calcDSMat); 
   boost::python::def("CalcDN2Mat", RDKit::calcDN2Mat); 
+  boost::python::def("CalcFrags", RDKit::calcFrags); 
+  boost::python::def("CalcAddFeatures", RDKit::calcAddFeatures); 
 
 
 
   // add InformationContent ... Done
   boost::python::def("CalcInformationContent", RDKit::calcInformationContent); // Inspired by 1984 Basak paper
+
+
+
 
 
 };

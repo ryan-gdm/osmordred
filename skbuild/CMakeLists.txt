@@ -8,36 +8,32 @@ cmake_policy(SET CMP0144 NEW)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+#set(CMAKE_MACOSX_RPATH 1)
 
 # define the C++ library "_cppmordred"
 add_library(_cppmordred MODULE cppmordred/cppmordred.cpp)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+#execute_process(
+#    COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include())"
+#    OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
+#    OUTPUT_STRIP_TRAILING_WHITESPACE
+#)
+
+
 include_directories(${PYTHON_INCLUDE_DIR})
 
-###
-# get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
 
-# find_package(RDKit REQUIRED COMPONENTS RDKitGraphMol RDKitDescriptors RDKitFingerprints RDKitRDGeneral RDKitDataStructs)
-
-# get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-# list(REMOVE_ITEM importTargetsAfter ${importTargets})
-
-# message("${importTargetsAfter}")
-###
-
-# Set RDKit paths (instead of conda)
-# set(RDKit_DIR "/Users/guillaume-osmo/miniconda3/pkgs/rdkit-2023.09.3-py311h64bc748_1/")
-# set(RDKIT_INCLUDE_DIR "${RDKit_DIR}/include/rdkit")
-# set(RDKIT_LIBRARY_DIR "${RDKit_DIR}/lib")
-# include_directories(${RDKIT_INCLUDE_DIR})
-# link_directories(${RDKIT_LIBRARY_DIR})
 
 find_package(RDKit REQUIRED)
 include_directories(${RDKit_INCLUDE_DIRS})
 # RDKit isn't reporting its libraries, so set a path and use it to point to them directly below.
 # This relies on the fact that we're installing it via Conda.
 set(RDKit_HACK_LIBRARY_DIR "${Python3_ROOT_DIR}/lib")
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH "${Python3_ROOT_DIR}/lib;/opt/homebrew/opt/lapack/lib")
 
 # set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -51,9 +47,6 @@ find_path(EIGEN3_INCLUDE_DIR Eigen/Dense
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Find and link Boost
-# set(BOOST_ROOT "/Users/guillaume-osmo/miniconda3/envs/osmo-sandox/")
-# set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
-# set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
 find_package(Boost REQUIRED python)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -75,22 +68,9 @@ else()
     message(FATAL_ERROR "LAPACK not found. Install LAPACK via Homebrew or appropriate package manager.")
 endif()
 
-# install(TARGETS cppmordred LIBRARY DESTINATION lib)
-
-# execute_process(
-#     COMMAND ${Python3_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"
-#     OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
-#     OUTPUT_STRIP_TRAILING_WHITESPACE
-# )
-
 
 # Find and link RDKit libraries
 target_link_libraries(_cppmordred PRIVATE
-    # RDKitGraphMol
-    # RDKitDescriptors
-    # RDKitFingerprints 
-    # RDKitRDGeneral
-    # RDKitDataStructs 
     ${RDKit_HACK_LIBRARY_DIR}/libRDKitDataStructs.dylib
     ${RDKit_HACK_LIBRARY_DIR}/libRDKitDescriptors.dylib
     ${RDKit_HACK_LIBRARY_DIR}/libRDKitFingerprints.dylib
