@@ -42,6 +42,7 @@
 #include <cstring> // For memcpy
 #include <functional>
 #include <numeric>
+#include <stack>
 #include <lapacke.h>
 //#include <cblas.h>
 
