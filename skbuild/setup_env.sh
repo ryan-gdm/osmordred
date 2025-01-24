@@ -1,11 +1,25 @@
 #!/bin/bash
 set -e
 
-eval "$(conda shell.bash hook)"
+function print_error {
+    echo
+    echo "Failed to create conda environment!!"
+    exit 1
+}
+trap print_error ERR
 
-conda create -y -n "cpp_mordred" python=3.11
-conda activate cpp_mordred
+conda env remove -y -n cpp_mordred
 
-conda install -y boost==1.82.0 eigen lapack mkl ninja rdkit==2023.9.3 -c conda-forge
+conda_packages="boost==1.82.0 build eigen lapack ninja rdkit==2023.9.3"
+if [[ "$OSTYPE" =~ ^darwin.* ]]; then
+    echo "Creating conda env with MacOS packages"
+    conda_packages="$conda_packages blas=*=*openblas"
+elif [[ "$OSTYPE" =~ ^linux.* ]]; then
+    echo "Creating conda env with Linux packages"
+    conda_packages="$conda_packages blas=*=*mkl"
+else
+    echo "Don't recogize os: $OSTYPE"
+    exit 1
+fi
 
-pip install scikit-build tqdm
+conda create -y -n "cpp_mordred" $conda_packages python=3.11 -c conda-forge

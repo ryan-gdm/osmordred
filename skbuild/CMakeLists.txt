@@ -21,7 +21,7 @@ include_directories(${RDKit_INCLUDE_DIRS})
 
 # Find and link Eigen
 find_path(EIGEN3_INCLUDE_DIR Eigen/Dense
-    PATHS ${CMAKE_PREFIX_PATH}/eigen
+    PATH_SUFFIXES /eigen
     REQUIRED
 )
 include_directories(${EIGEN3_INCLUDE_DIR})
