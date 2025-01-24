@@ -1890,6 +1890,11 @@ double calcSchultz(const ROMol &mol) {
 
     return schultz;
 }
+std::vector<double> calcSchultzWrapper(const RDKit::ROMol &mol) {
+    std::vector<double> res(1,0.);
+    res[0] = calcSchultz(mol);;
+    return res;
+}
 
 
     static const std::map<int, double> Polarizability78AtomicMap() {
@@ -9426,7 +9431,7 @@ BOOST_PYTHON_MODULE(_cppmordred) {
   boost::python::def("CalcMR", RDKit::calcMR); 
   boost::python::def("CalcFlexibility", RDKit::calcFlexibility); 
   boost::python::def("CalcODT", RDKit::calcODT); 
-  boost::python::def("CalcSchultz", RDKit::calcSchultz); 
+  boost::python::def("CalcSchultz", RDKit::calcSchultzWrapper);
   boost::python::def("CalcRNCGRPCG", RDKit::calcRNCG_RPCG); 
   boost::python::def("CalcAZV", RDKit::calcAZV); 
   boost::python::def("CalcASV", RDKit::calcASV); 

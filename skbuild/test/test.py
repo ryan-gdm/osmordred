@@ -80,7 +80,7 @@ def CalcMordredCPP(smiles, version=2):
             # results.append(np.array(rd.CalcMR(mol))) 
             #results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
             # results.append(np.array(rd.CalcFlexibility(mol))) 
-            # results.append(np.array(rd.CalcSchultz(mol))) 
+            results.append(np.array(rd.CalcSchultz(mol)))
             results.append(np.array(rd.CalcAlphaKappaShapeIndex(mol))) 
             results.append(np.array(rd.CalcHEState(mol))) # very slightly slower
             results.append(np.array(rd.CalcBEState(mol))) # as a true impact
