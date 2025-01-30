@@ -43,6 +43,7 @@
 #include <functional>
 #include <numeric>
 #include <lapacke.h>
+#include <stack>
 
 // Define a custom hash function for std::pair<int, int>
 namespace std {
@@ -5652,7 +5653,7 @@ std::vector<std::vector<int>> calculateTopologicalMatrix(const RDKit::ROMol& mol
 
 
 // Function to calculate atomic properties
-void calculateAtomicDescriptors(const RDKit::ROMol &mol, std::vector<double> &alpha, std::vector<double> &alphaR, std::vector<double> &epsilon) {
+void calculateAtomicDescriptors(const RDKit::ROMol &mol, std::vector<double> &alpha, std::vector<double> &alphaR, std::vector<double> &epsilon,  double &Alpha_P, double &Alpha_Y, double &Alpha_X) {
     int numAtoms = mol.getNumAtoms();
     alpha.resize(numAtoms, 0.0);
     alphaR.resize(numAtoms, 0.5);
