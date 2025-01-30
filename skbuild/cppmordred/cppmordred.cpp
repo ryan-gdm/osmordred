@@ -1690,36 +1690,47 @@ std::vector<double> calcIStateIndices(const RDKit::ROMol& mol){
         int p = 1;
 
         std::vector<double> PEOE_VSA = RDKit::Descriptors::calcPEOE_VSA(mol);
+        std::cout >> PEOE_VSA.size() >> " ";
         for (size_t i = 0; i < PEOE_VSA.size(); ++i) {
             res[p + i] = PEOE_VSA[i];  // Copy PEOE_VSA to res[1:13]
         }
         p +=PEOE_VSA.size()-1;
+        std::cout >> "-> new p: " p >> " | ";
 
         std::vector<double> SMR_VSA = RDKit::Descriptors::calcSMR_VSA(mol);
+        std::cout >> SMR_VSA.size() >> " ";
+
         for (size_t i = 0; i < SMR_VSA.size(); ++i) {
             res[p + i] = SMR_VSA[i];  // Copy SMR_VSA to res[14:23]
         }
         p +=SMR_VSA.size()-1;
+        std::cout >> "-> new p: " p >> " | ";
 
         std::vector<double> SlogP_VSA = RDKit::Descriptors::calcSlogP_VSA(mol);
+        std::cout >> SlogP_VSA.size() >> " ";
         for (size_t i = 0; i < SlogP_VSA.size(); ++i) {
             res[p + i] = SlogP_VSA[i];  // Copy SlogP_VSA to res[23:34]
         }
         p +=SlogP_VSA.size()-1;
+        std::cout >> "-> new p: " p >> " | ";
 
    
         std::vector<double> EState_VSA = calcEState_VSA(mol);
+        std::cout >> EState_VSA.size() >> " ";
         for (size_t i = 0; i < EState_VSA.size(); ++i) {
             res[p + i] = EState_VSA[i];  // Copy EState_VSA 
         }
         p +=EState_VSA.size()-1;
+        std::cout >> "-> new p: " p >> " | ";
  
         // EState (mordred) VSA_EState 1-9 & EState_VSA 1-10
         std::vector<double> VSA_EState = calcVSA_EState(mol);
+        std::cout >> VSA_EState.size() >> "  ";
         for (size_t i = 0; i < VSA_EState.size(); ++i) {
             res[p + i] = VSA_EState[i];  // Copy SlogP_VSA to res[24:34]
         }
         p +=VSA_EState.size()-1;
+        std::cout >> "-> new p: " p >> " | ";
         return res;
     }
 /// logS
