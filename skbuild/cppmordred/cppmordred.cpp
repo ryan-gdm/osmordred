@@ -939,7 +939,7 @@ std::vector<double> calcAddFeatures(const RDKit::ROMol& mol) {
     std::vector<double> calcVertexAdjacencyInformation(const ROMol &mol) {
 	    
         std::vector<double> res(1,0.);
-	res[0]=VertexAdjacencyInformation(mol));
+	res[0]=VertexAdjacencyInformation(mol);
         return res;
     }
 
@@ -1273,7 +1273,7 @@ std::vector<double> calcAddFeatures(const RDKit::ROMol& mol) {
     std::vector<double> calcVdwVolumeABC(const ROMol &mol) {
 	
         std::vector<double> res(1,0.);
-	res[0]=VdwVolumeABC(mol));
+	res[0]=VdwVolumeABC(mol);
         return res;
     }
 
