@@ -2296,7 +2296,9 @@ std::vector<double> calcSchultz(const RDKit::ROMol &mol) {
 
 
     std::vector<double> calcFragmentComplexity(const ROMol& mol) {
-        std::vector<double> res(FragmentComplexity(mol));
+	    
+        std::vector<double> res(1, 0.);
+	res[0]=FragmentComplexity(mol);
         return res;
     }
 
