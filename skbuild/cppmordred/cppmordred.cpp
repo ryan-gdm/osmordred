@@ -2026,8 +2026,9 @@ std::vector<double> calcIStateIndices(const RDKit::ROMol& mol){
     }
 
   std::vector<double> calcMcGowanVolume(const RDKit::ROMol &mol) {
-   std::vector<double> res(McGowanVolume(mol));
-    return res;
+        std::vector<double> res(1,0.);
+        res[0] = McGowanVolume(mol);
+        return res;
  }
 
 
