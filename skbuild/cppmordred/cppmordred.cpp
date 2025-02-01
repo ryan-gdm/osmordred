@@ -2346,8 +2346,8 @@ std::vector<double> calcSchultz(const RDKit::ROMol &mol) {
     }
 
     // it is not correct!!!!
-    int calcEccentricConnectivityIndex(const ROMol& mol) {
-
+    std::vector<double> calcEccentricConnectivityIndex(const ROMol& mol) {
+	std::vector<double> res(1,0.);
         Eigen::VectorXd E = calculateEccentricity(mol);
         std::vector<double> V = calcValence(mol);
 
@@ -2361,9 +2361,9 @@ std::vector<double> calcSchultz(const RDKit::ROMol &mol) {
         for (size_t i = 0; i < E.size(); ++i) {
             productSum += static_cast<int>(E[i]) * V[i];  // Cast E[i] to int and multiply with V[i]
         }
-
+	res[0] = productSum;
         // Return the result as an integer
-        return static_cast<int>(productSum);
+        return res;//static_cast<int>(productSum);
     }
 
 
