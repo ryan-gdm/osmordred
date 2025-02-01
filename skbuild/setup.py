@@ -7,15 +7,15 @@ import os
 
 setup(
     name="cppmordred",
-    version="0.1.0",
-    description="A Python package for mordred in cpp using RDKit 2023.09.3, LAPACK and pybind11.",
+    version="0.1.3",
+    description="A Python package for mordred in cpp using RDKit 2023.09.3, Lapack.",
 
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="Guillaume Godin",
     author_email="guillaume.godin@gmail.com",
 
-    license="MIT",
+    license="BSD-3-Clause",
     packages=["cppmordred"],
     cmake_args=[
         f"-DCMAKE_PREFIX_PATH={os.environ.get('CONDA_PREFIX')}",
@@ -24,7 +24,7 @@ setup(
     install_requires=["scikit-build", "numpy==1.26.4"],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: BSD-3-Clause License",
         "Operating System :: OS Independent",
     ],
 )
