@@ -28,7 +28,7 @@ The Lapack can produce very small fluctuation for almost zeros Eigen values and 
 
 conda activate osmordred
 
-pip install dist/osmordred-0.2.0-cp311-cp311-macosx_15_0_arm64.whl --force-reinstall or linux wheel file
+pip install dist/osmordred-0.2.0-cp311-cp311-macosx_15_0_arm64.whl --force-reinstall 
 ```
 
 ### Method 2 : include into your current environement (for the moment python 3.11 for RDKit 2023.9.3)
