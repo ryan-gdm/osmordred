@@ -9980,7 +9980,7 @@ std::vector<double> calcDN2Z(const RDKit::ROMol &mol) {
 
 
 
-BOOST_PYTHON_MODULE(_cppmordred) {
+BOOST_PYTHON_MODULE(_osmordred) {
 
   boost::python::def("CalcABCIndex", RDKit::calcABCIndex);
   boost::python::def("CalcAcidBase", RDKit::calcAcidBase);
