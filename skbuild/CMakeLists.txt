@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # define the C++ library "_cppmordred"
-add_library(_cppmordred MODULE osmordred/osmordred.cpp)
+add_library(_osmordred MODULE osmordred/osmordred.cpp)
 
 # Find and link python
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -71,4 +71,4 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${Python3_ROOT_DIR}/lib;/opt/homebrew/opt/lapack/lib")
 
-install(TARGETS _osmordred LIBRARY DESTINATION ospmordred)
+install(TARGETS _osmordred LIBRARY DESTINATION osmordred)
