@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(cppmordred)
+project(osmordred)
 
 # Set policies
 cmake_policy(SET CMP0144 NEW)
@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # define the C++ library "_cppmordred"
-add_library(_cppmordred MODULE cppmordred/cppmordred.cpp)
+add_library(_cppmordred MODULE osmordred/osmordred.cpp)
 
 # Find and link python
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -46,7 +46,7 @@ find_library(libRDKitSubgraphs NAMES "RDKitSubgraphs")
 find_library(libRDKitSubstructMatch NAMES "RDKitSubstructMatch")
 
 # Find and link RDKit libraries
-target_link_libraries(_cppmordred PRIVATE
+target_link_libraries(_osmordred PRIVATE
     ${libRDKitDataStructs}
     ${libRDKitDescriptors}
     ${libRDKitFingerprints}
@@ -62,7 +62,7 @@ target_link_libraries(_cppmordred PRIVATE
     ${Python3_LIBRARIES}
     )
 
-set_target_properties(_cppmordred PROPERTIES
+set_target_properties(_osmordred PROPERTIES
     PREFIX ""
     SUFFIX ".so"
 )
@@ -71,4 +71,4 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${Python3_ROOT_DIR}/lib;/opt/homebrew/opt/lapack/lib")
 
-install(TARGETS _cppmordred LIBRARY DESTINATION cppmordred)
+install(TARGETS _osmordred LIBRARY DESTINATION ospmordred)
