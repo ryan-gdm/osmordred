@@ -6,9 +6,9 @@ import os
 
 
 setup(
-    name="cppmordred",
-    version="0.1.3",
-    description="A Python package for mordred in cpp using RDKit 2023.09.3, Lapack.",
+    name="osmordred",
+    version="0.2.0",
+    description="A Python package to generate osmordred features using RDKit 2023.09.3, Lapack.",
 
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -16,7 +16,7 @@ setup(
     author_email="guillaume.godin@gmail.com",
 
     license="BSD-3-Clause",
-    packages=["cppmordred"],
+    packages=["osmordred"],
     cmake_args=[
         f"-DCMAKE_PREFIX_PATH={os.environ.get('CONDA_PREFIX')}",
     ],
