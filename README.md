@@ -63,6 +63,9 @@ python test.py
 
 #### note that attempting to `import osmordred` from python running in the skbuild directory does not work, as it imports the `osmordred` subdirectory.
 
+### Known issue:
+such molecule with lag : c12c3c4c5c1c1c6c7c2c2c8c3c3c9c4c4c%10c5c5c1c1c6c6c%11c7c2c2c7c8c3c3c8c9c4c4c9c%10c5c5c1c1c6c6c%11c2c2c7c3c3c8c4c4c9c5c1c1c6c2c3c41
+
 ## License:
 
 BSD-3-Clause
