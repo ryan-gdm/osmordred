@@ -4,7 +4,7 @@ import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed, TimeoutError
 
 from tqdm import tqdm
-import cppmordred as rd
+import osmordred as rd
 
 
 
