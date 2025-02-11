@@ -57,6 +57,7 @@ pip show osmordred   # normally you can see the installation in your environemen
 #### example for testing:
 ```
 cd test
+pip install tqdm
 python test.py
 ```
 
