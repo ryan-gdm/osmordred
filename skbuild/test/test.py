@@ -4,11 +4,11 @@ import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 
-import cppmordred as rd
+import osmordred as rd
 
 
 # Define descriptor computation function
-def CalcMordredCPP(smiles, version=2):
+def CalcOsmordred(smiles, version=2):
 
 
     if version == 1:
@@ -107,7 +107,7 @@ def Calculate(smiles_list, n_jobs=4,  version=1):
     results = []
     with ProcessPoolExecutor(max_workers=n_jobs) as executor:
         # Submit tasks with their indices
-        futures = {executor.submit(CalcMordredCPP, smi, version): idx for idx, smi in enumerate(smiles_list)}
+        futures = {executor.submit(CalcOsmordred, smi, version): idx for idx, smi in enumerate(smiles_list)}
         for future in tqdm(as_completed(futures), total=len(futures), desc="Processing molecules"):
             idx = futures[future]  # Retrieve the index of the SMILES string
             try:
@@ -127,7 +127,7 @@ def Calculate(smiles_list, n_jobs=4,  version=1):
 
 
 if __name__ == "__main__":
-    print("cppmordred library contents:")
+    print("Osmordred library contents:")
     print(dir(rd))
     version = 2
     smiles = ['CCCO','CCCN','c1ccccc1']
