@@ -9,7 +9,7 @@ function print_error {
 trap print_error ERR
 
 echo "Removing existing environment (if present)"
-conda env remove -y -n cpp_mordred &>/dev/null || true
+conda env remove -y -n osmordred &>/dev/null || true
 
 conda_packages="boost==1.82.0 eigen lapack ninja python-build rdkit==2023.9.3"
 if [[ "$OSTYPE" =~ ^darwin.* ]]; then
@@ -23,4 +23,4 @@ else
     exit 1
 fi
 
-conda create -y -n cpp_mordred $conda_packages python=3.11 -c conda-forge
+conda create -y -n osmordred $conda_packages python=3.11 -c conda-forge
