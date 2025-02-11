@@ -1,4 +1,4 @@
-# Unified RDkit new descriptors in c++
+# Osmordred : Unified RDkit new descriptors in c++
 
 Osmordred was inspired by the Dragon, Padel, Mordred and other toolkits to generate empirical molecular features
 Our goal focus only on 0D,1D  and 2D molecular descriptors fused with rdkit backend at cpp level to get very fast computation in parallel if needed.
