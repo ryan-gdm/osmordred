@@ -1,4 +1,4 @@
-from ._cppmordred import (
+from ._osmordred import (
     CalcABCIndex,
     CalcAcidBase,
     CalcAromatic,
