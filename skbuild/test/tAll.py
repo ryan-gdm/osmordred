@@ -5,13 +5,13 @@ import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed, TimeoutError
 
 from tqdm import tqdm
-import cppmordred as rd
+import osmordred as rd
 
 
 
 
 # Define descriptor computation function
-def CalcMordredCPP(smiles, version=2, names = False, mynames=[]):
+def CalcOsmordred(smiles, version=2, names = False, mynames=[]):
 
 
     if version == 1:
@@ -129,11 +129,11 @@ def CalcMordredCPP(smiles, version=2, names = False, mynames=[]):
 
 
 if __name__ == "__main__":
-    _, mynames = CalcMordredCPP('CCCO',version=2, names=True)
+    _, mynames = CalcOsmordred('CCCO',version=2, names=True)
     print(len(mynames))
     smiles = ['CCCO','CCCN','c1ccccc1']
     for s in smiles:
         mol = Chem.MolFromSmiles(s)
-        results =  CalcMordredCPP(s, version=2,names=False,mynames= mynames)
+        results =  CalcOsmordred(s, version=2,names=False,mynames= mynames)
         print(list(results))
         
