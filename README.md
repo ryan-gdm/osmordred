@@ -5,8 +5,8 @@ Our goal focus only on 0D,1D  and 2D molecular descriptors fused with rdkit back
 
 ## Remark on reproductibility:
 
-I spent quite time to implement a descent Information Content descriptor version based on the first paper from 1984 where Basak describe his method.
-So our implementation of Information Content is not 100% identical to Basak, Padel and Mordred but it follow  the core Basak logic within RDkit where aromaticity is "specific".
+I spent quite time to implement a descent Information Content descriptor version based on the first paper from 1984 where Basak describes in detail his method https://www.sciencedirect.com/science/article/abs/pii/B9780080301563501387#:~:text=https%3A//doi.org/10.1016/B978%2D0%2D08%2D030156%2D3.50138%2D7.
+So our implementation of Information Content is not 100% identical to Basak, Padel and Mordred but it follows the core Basak logic within RDkit where aromaticity is "specific".
 This was indeed during this period that I also implement the Triplet features from Basak team. 
 
 ## Future:
