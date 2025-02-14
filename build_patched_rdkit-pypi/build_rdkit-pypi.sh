@@ -28,6 +28,7 @@ git apply ../rdkit-pypi_2023_09_3_osmordred.diff
 cp -a ../../osmordred_rdkit_2023_09_3_patches .
 mkdir osmordred_source
 cp -a ../../Code osmordred_source
+cp -a ../../rdkit osmordred_source
 
 echo "Kicking off cibuildwheel"
 $CONDA_RUN python3 -m cibuildwheel --output-dir wheelhouse --config-file pyproject.toml
