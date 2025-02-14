@@ -9,192 +9,192 @@ BOOST_PYTHON_MODULE(rdOsmordred) {
     python::scope().attr("__doc__") = "Functions for Mordred calculations";
 
     python::def("CalcABCIndex", calcABCIndex,
-        "CalcABCIndex Lorem Ipsum\n");
+        "CalcABCIndex function\n");
     python::def("CalcAcidBase", calcAcidBase,
-        "CalcAcidBase Lorem Ipsum\n");
+        "CalcAcidBase function\n");
     python::def("CalcAromatic", calcAromatic,
-        "CalcAromatic Lorem Ipsum\n");
+        "CalcAromatic function\n");
     python::def("CalcAtomCount", calcAtomCounts,
-        "CalcAtomCounts Lorem Ipsum\n");
+        "CalcAtomCounts function\n");
     python::def("CalcBalabanJ", calcBalabanJ,
-        "CalcBalabanJ Lorem Ipsum\n");
+        "CalcBalabanJ function\n");
     python::def("CalcBertzCT", calcBertzCT,
-        "CalcBertzCT Lorem Ipsum\n");
+        "CalcBertzCT function\n");
     python::def("CalcBondCount", calcBondCounts,
-        "CalcBondCounts Lorem Ipsum\n");
+        "CalcBondCounts function\n");
     python::def("CalcVertexAdjacencyInformation", calcVertexAdjacencyInformation,
-        "CalcVertexAdjacencyInformation Lorem Ipsum\n");
+        "CalcVertexAdjacencyInformation function\n");
     python::def("CalcWeight", calcWeight,
-        "CalcWeight Lorem Ipsum\n");
+        "CalcWeight function\n");
     python::def("CalcWienerIndex", calcWienerIndex,
-        "CalcWienerIndex Lorem Ipsum\n");
+        "CalcWienerIndex function\n");
     python::def("CalcVdwVolumeABC", calcVdwVolumeABC,
-        "CalcVdwVolumeABC Lorem Ipsum\n");
+        "CalcVdwVolumeABC function\n");
     python::def("CalcTopoPSA", calcTopoPSA,
-        "CalcTopoPSA Lorem Ipsum\n");
+        "CalcTopoPSA function\n");
     python::def("CalcSLogP", calcSLogP,
-        "CalcSLogP Lorem Ipsum\n");
+        "CalcSLogP function\n");
     python::def("CalcHydrogenBond", calcHydrogenBond,
-        "CalcHydrogenBond Lorem Ipsum\n");
+        "CalcHydrogenBond function\n");
     python::def("CalcLogS", calcLogS,
-        "CalcLogS Lorem Ipsum\n");
+        "CalcLogS function\n");
     python::def("CalcLipinski", calcLipinskiGhose,
-        "CalcLipinskiGhose Lorem Ipsum\n");
+        "CalcLipinskiGhose function\n");
     python::def("CalcMcGowanVolume", calcMcGowanVolume,
-        "CalcMcGowanVolume Lorem Ipsum\n");
+        "CalcMcGowanVolume function\n");
     python::def("CalcPolarizability", calcPolarizability,
-        "CalcPolarizability Lorem Ipsum\n");
+        "CalcPolarizability function\n");
     python::def("CalcRotatableBond", calcRotatableBond,
-        "CalcRotatableBond Lorem Ipsum\n");
+        "CalcRotatableBond function\n");
     python::def("CalcFragmentComplexity", calcFragmentComplexity,
-        "CalcFragmentComplexity Lorem Ipsum\n");
+        "CalcFragmentComplexity function\n");
     python::def("CalcConstitutional", calcConstitutional,
-        "CalcConstitutional Lorem Ipsum\n");
+        "CalcConstitutional function\n");
     python::def("CalcTopologicalIndex", calcTopologicalIndex,
-        "CalcTopologicalIndex Lorem Ipsum\n");
+        "CalcTopologicalIndex function\n");
     python::def("CalcDetourMatrixEigen", calcDetourMatrixDescs,
-        "CalcDetourMatrixDescs Lorem Ipsum\n");
+        "CalcDetourMatrixDescs function\n");
     python::def("CalcDetourMatrix", calcDetourMatrixDescsL,
-        "CalcDetourMatrixDescsL Lorem Ipsum\n");
+        "CalcDetourMatrixDescsL function\n");
     python::def("CalcDistanceMatrixEigen", calcDistMatrixDescs,
-        "CalcDistMatrixDescs Lorem Ipsum\n");
+        "CalcDistMatrixDescs function\n");
     python::def("CalcDistanceMatrix", calcDistMatrixDescsL,
-        "CalcDistMatrixDescsL Lorem Ipsum\n");
+        "CalcDistMatrixDescsL function\n");
     python::def("CalcAdjacencyMatrixEigen", calcAdjMatrixDescs,
-        "CalcAdjMatrixDescs Lorem Ipsum\n");
+        "CalcAdjMatrixDescs function\n");
     python::def("CalcAdjacencyMatrix", calcAdjMatrixDescsL,
-        "CalcAdjMatrixDescsL Lorem Ipsum\n");
+        "CalcAdjMatrixDescsL function\n");
     python::def("CalcCarbonTypes", calcCarbonTypes,
-        "CalcCarbonTypes Lorem Ipsum\n");
+        "CalcCarbonTypes function\n");
     python::def("CalcEccentricConnectivityIndex", calcEccentricConnectivityIndex,
-        "CalcEccentricConnectivityIndex Lorem Ipsum\n");
+        "CalcEccentricConnectivityIndex function\n");
     python::def("CalcBaryszMatrix", calcBaryszMatrixDescsL,
-        "CalcBaryszMatrixDescsL Lorem Ipsum\n");
+        "CalcBaryszMatrixDescsL function\n");
     python::def("CalcBaryszMatrixEigen", calcBaryszMatrixDescs,
-        "CalcBaryszMatrixDescs Lorem Ipsum\n");
+        "CalcBaryszMatrixDescs function\n");
     python::def("CalcZagrebIndex", calcZagrebIndex,
-        "CalcZagrebIndex Lorem Ipsum\n");
+        "CalcZagrebIndex function\n");
     python::def("CalcMoeType", calcMoeType,
-        "CalcMoeType Lorem Ipsum\n");
+        "CalcMoeType function\n");
     python::def("CalcMolecularDistanceEdge", calcMolecularDistanceEdgeDescs,
-        "CalcMolecularDistanceEdgeDescs Lorem Ipsum\n");
+        "CalcMolecularDistanceEdgeDescs function\n");
     python::def("CalcEState", calcEStateDescs,
-        "CalcEStateDescs Lorem Ipsum\n");
+        "CalcEStateDescs function\n");
     python::def("CalcWalkCount", calcWalkCounts,
-        "CalcWalkCounts Lorem Ipsum\n");
+        "CalcWalkCounts function\n");
     python::def("CalcTopologicalCharge", calcTopologicalChargeDescs,
-        "CalcTopologicalChargeDescs Lorem Ipsum\n");
+        "CalcTopologicalChargeDescs function\n");
     python::def("CalcChi", calcAllChiDescriptors,
-        "CalcAllChiDescriptors Lorem Ipsum\n");
+        "CalcAllChiDescriptors function\n");
     python::def("CalcPathCount", calcPathCount,
-        "CalcPathCount Lorem Ipsum\n");
+        "CalcPathCount function\n");
     python::def("CalcKappaShapeIndex", calcKappaShapeIndex,
-        "CalcKappaShapeIndex Lorem Ipsum\n");
+        "CalcKappaShapeIndex function\n");
     python::def("CalcRingCount", calcRingCount,
-        "CalcRingCount Lorem Ipsum\n");
+        "CalcRingCount function\n");
     python::def("CalcMolecularId", calcMolecularId,
-        "CalcMolecularId Lorem Ipsum\n");
+        "CalcMolecularId function\n");
     python::def("CalcBCUT", calcBCUTs,
-        "CalcBCUTs Lorem Ipsum\n");
+        "CalcBCUTs function\n");
     python::def("CalcAutocorrelation", calcAutoCorrelation,
-        "CalcAutoCorrelation Lorem Ipsum\n");
+        "CalcAutoCorrelation function\n");
     python::def("CalcFramework", calcFramework,
-        "CalcFramework Lorem Ipsum\n");
+        "CalcFramework function\n");
     python::def("CalcExtendedTopochemicalAtom", calcExtendedTopochemicalAtom,
-        "CalcExtendedTopochemicalAtom Lorem Ipsum\n");
+        "CalcExtendedTopochemicalAtom function\n");
     python::def("CalcExtendedTopochemicalAtom2", calculateETADescriptors,
-        "CalculateETADescriptors Lorem Ipsum\n");
+        "CalculateETADescriptors function\n");
     python::def("CalcChipath", calcChipath,
-        "CalcChipath Lorem Ipsum\n");
+        "CalcChipath function\n");
     python::def("CalcChichain", calcChichain,
-        "CalcChichain Lorem Ipsum\n");
+        "CalcChichain function\n");
     python::def("CalcChicluster", calcChicluster,
-        "CalcChicluster Lorem Ipsum\n");
+        "CalcChicluster function\n");
     python::def("CalcChipathcluster", calcChipathcluster,
-        "CalcChipathcluster Lorem Ipsum\n");
+        "CalcChipathcluster function\n");
     python::def("CalcAcidicGroupCount", calcAcidicGroupCount,
-        "CalcAcidicGroupCount Lorem Ipsum\n");
+        "CalcAcidicGroupCount function\n");
     python::def("CalcBasicGroupCount", calcBasicGroupCount,
-        "CalcBasicGroupCount Lorem Ipsum\n");
+        "CalcBasicGroupCount function\n");
     python::def("CalcCountAromaticAtoms", countAromaticAtoms,
-        "CalcCountAromaticAtoms Lorem Ipsum");
+        "CalcCountAromaticAtoms function");
     python::def("CalcCountAromaticBonds", countAromaticBonds,
-        "CalcCountAromaticBonds Lorem Ipsum");
+        "CalcCountAromaticBonds function");
     python::def("CalcBEState", calcBEStateDescs,
-        "CalcBEStateDescs Lorem Ipsum\n");
+        "CalcBEStateDescs function\n");
     python::def("CalcHEState", calcHEStateDescs,
-        "CalcHEStateDescs Lorem Ipsum\n");
+        "CalcHEStateDescs function\n");
     python::def("CalcAlphaKappaShapeIndex", calcAlphaKappaShapeIndex,
-        "CalcAlphaKappaShapeIndex Lorem Ipsum\n");
+        "CalcAlphaKappaShapeIndex function\n");
     python::def("CalcAbrahams", calcAbrahams,
-        "CalcAbrahams Lorem Ipsum\n");
+        "CalcAbrahams function\n");
     python::def("CalcPol", calcPol,
-        "CalcPol Lorem Ipsum\n");
+        "CalcPol function\n");
     python::def("CalcMR", calcMR,
-        "CalcMR Lorem Ipsum\n");
+        "CalcMR function\n");
     python::def("CalcFlexibility", calcFlexibility,
-        "CalcFlexibility Lorem Ipsum\n");
+        "CalcFlexibility function\n");
     python::def("CalcODT", calcODT,
-        "CalcODT Lorem Ipsum\n");
+        "CalcODT function\n");
     python::def("CalcSchultz", calcSchultz,
-        "CalcSchultz Lorem Ipsum\n");
+        "CalcSchultz function\n");
     python::def("CalcRNCGRPCG", calcRNCG_RPCG,
-        "CalcRNCG_RPCG Lorem Ipsum\n");
+        "CalcRNCG_RPCG function\n");
     python::def("CalcAZV", calcAZV,
-        "CalcAZV Lorem Ipsum\n");
+        "CalcAZV function\n");
     python::def("CalcASV", calcASV,
-        "CalcASV Lorem Ipsum\n");
+        "CalcASV function\n");
     python::def("CalcDSV", calcDSV,
-        "CalcDSV Lorem Ipsum\n");
+        "CalcDSV function\n");
     python::def("CalcAZS", calcAZS,
-        "CalcAZS Lorem Ipsum\n");
+        "CalcAZS function\n");
     python::def("CalcASZ", calcASZ,
-        "CalcASZ Lorem Ipsum\n");
+        "CalcASZ function\n");
     python::def("CalcDN2S", calcDN2S,
-        "CalcDN2S Lorem Ipsum\n");
+        "CalcDN2S function\n");
     python::def("CalcDN2I", calcDN2I,
-        "CalcDN2I Lorem Ipsum\n");
+        "CalcDN2I function\n");
     python::def("CalcASI", calcASI,
-        "CalcASI Lorem Ipsum\n");
+        "CalcASI function\n");
     python::def("CalcDSI", calcDSI,
-        "CalcDSI Lorem Ipsum\n");
+        "CalcDSI function\n");
     python::def("CalcASN", calcASN,
-        "CalcASN Lorem Ipsum\n");
+        "CalcASN function\n");
     python::def("CalcDSN", calcDSN,
-        "CalcDSN Lorem Ipsum\n");
+        "CalcDSN function\n");
     python::def("CalcDN2N", calcDN2N,
-        "CalcDN2N Lorem Ipsum\n");
+        "CalcDN2N function\n");
     python::def("CalcANS", calcANS,
-        "CalcANS Lorem Ipsum\n");
+        "CalcANS function\n");
     python::def("CalcANV", calcANV,
-        "CalcANV Lorem Ipsum\n");
+        "CalcANV function\n");
     python::def("CalcAZN", calcAZN,
-        "CalcAZN Lorem Ipsum\n");
+        "CalcAZN function\n");
     python::def("CalcANZ", calcANZ,
-        "CalcANZ Lorem Ipsum\n");
+        "CalcANZ function\n");
     python::def("CalcANI", calcANI,
-        "CalcANI Lorem Ipsum\n");
+        "CalcANI function\n");
     python::def("CalcDSZ", calcDSZ,
-        "CalcDSZ Lorem Ipsum\n");
+        "CalcDSZ function\n");
     python::def("CalcANN", calcANN,
-        "CalcANN Lorem Ipsum\n");
+        "CalcANN function\n");
     python::def("CalcDN2Z", calcDN2Z,
-        "CalcDN2Z Lorem Ipsum\n");
+        "CalcDN2Z function\n");
     python::def("CalcANMat", calcANMat,
-        "CalcANMat Lorem Ipsum\n");
+        "CalcANMat function\n");
     python::def("CalcAZMat", calcAZMat,
-        "CalcAZMat Lorem Ipsum\n");
+        "CalcAZMat function\n");
     python::def("CalcASMat", calcASMat,
-        "CalcASMat Lorem Ipsum\n");
+        "CalcASMat function\n");
     python::def("CalcDSMat", calcDSMat,
-        "CalcDSMat Lorem Ipsum\n");
+        "CalcDSMat function\n");
     python::def("CalcDN2Mat", calcDN2Mat,
-        "CalcDN2Mat Lorem Ipsum\n");
+        "CalcDN2Mat function\n");
     python::def("CalcFrags", calcFrags,
-        "CalcFrags Lorem Ipsum\n");
+        "CalcFrags function\n");
     python::def("CalcAddFeatures", calcAddFeatures,
-        "CalcAddFeatures Lorem Ipsum\n");
+        "CalcAddFeatures function\n");
     python::def("CalcInformationContent", calcInformationContent,
-        "CalcInformationContent Lorem Ipsum\n");
+        "CalcInformationContent function\n");
 
 };
