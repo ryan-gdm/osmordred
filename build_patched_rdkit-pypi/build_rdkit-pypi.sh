@@ -4,8 +4,8 @@ set -e
 # work in the script directory
 cd $(dirname $0)
 
-if [ -z "$CIBW_BUILD" ]; then
-    echo "You must set CIBW_BUILD to set a build target environment."
+if [[ -z "$CIBW_BUILD" || -z "$CIBW_PLATFORM" ]]; then
+    echo "You must set CIBW_BUILD and CIBW_PLATFORM to set a build target environment."
     exit 1
 fi
 
@@ -29,4 +29,5 @@ cp -a ../../osmordred_rdkit_2023_09_3_patches .
 mkdir osmordred_source
 cp -a ../../Code osmordred_source
 
-$CONDA_RUN python3 -m cibuildwheel --platform linux --output-dir wheelhouse --config-file pyproject.toml
+echo "Kicking off cibuildwheel"
+$CONDA_RUN python3 -m cibuildwheel --output-dir wheelhouse --config-file pyproject.toml
