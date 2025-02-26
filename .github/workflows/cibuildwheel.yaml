@@ -1,11 +1,6 @@
 name: rdkit-osmordred CIBuildWheel
 on:
   workflow_dispatch:
-    inputs:
-      # source_tar:
-      #   description: 'Name of source tar file'
-      #   required: true
-      #   default: 'torch_source_packages_latest.tar'
 jobs:
   build_wheels:
     name: Build wheels on mac
