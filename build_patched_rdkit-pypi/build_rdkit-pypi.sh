@@ -9,12 +9,16 @@ if [[ -z "$CIBW_BUILD" || -z "$CIBW_PLATFORM" ]]; then
     exit 1
 fi
 
-CONDA_ENV=build-rdkit-pypi
-CONDA_RUN="conda run -n $CONDA_ENV"
+if [ -z "$NO_CONDA" ]; then
+    CONDA_ENV=build-rdkit-pypi
+    RUN="conda run -n $CONDA_ENV"
+    echo "Will create a conda env ($CONDA_ENV) to launch cibuildwheel from"
+    conda create -y -n $CONDA_ENV python=3.11
+else
+    RUN=
+fi
 
-echo "Will create a conda env ($CONDA_ENV) to launch cibuildwheel from"
-conda create -y -n $CONDA_ENV python=3.11 
-$CONDA_RUN pip install cibuildwheel
+$RUN pip install cibuildwheel==2.16.2
 
 # there's no tag in rdkit-pypi for the 2023.9.3 release
 # (I think it moved from a different repo)
@@ -31,4 +35,4 @@ cp -a ../../Code osmordred_source
 cp -a ../../rdkit osmordred_source
 
 echo "Kicking off cibuildwheel"
-$CONDA_RUN python3 -m cibuildwheel --output-dir wheelhouse --config-file pyproject.toml
+$RUN python3 -m cibuildwheel --output-dir wheelhouse --config-file pyproject.toml
