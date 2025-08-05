@@ -2,7 +2,6 @@ from rdkit import Chem
 import numpy as np
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from tqdm import tqdm
 
 import osmordred as rd
 
@@ -108,7 +107,7 @@ def Calculate(smiles_list, n_jobs=4,  version=1):
     with ProcessPoolExecutor(max_workers=n_jobs) as executor:
         # Submit tasks with their indices
         futures = {executor.submit(CalcOsmordred, smi, version): idx for idx, smi in enumerate(smiles_list)}
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Processing molecules"):
+        for future in as_completed(futures):
             idx = futures[future]  # Retrieve the index of the SMILES string
             try:
                 result = future.result()
