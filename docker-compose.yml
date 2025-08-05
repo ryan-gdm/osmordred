@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  osmordred:
+    build: .
+    volumes:
+      - .:/osmordred
+    command: tail -f /dev/null
+    platform: linux/amd64
+    container_name: osmordred

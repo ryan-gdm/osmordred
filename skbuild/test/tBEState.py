@@ -1,9 +1,4 @@
 from rdkit import Chem
-import numpy as np
-import pandas as pd
-from concurrent.futures import ProcessPoolExecutor, as_completed, TimeoutError
-
-from tqdm import tqdm
 import osmordred as rd
 
 
