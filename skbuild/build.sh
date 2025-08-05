@@ -30,6 +30,7 @@ echo "Activating the environment"
 conda activate osmordred
 
 echo "Building the wheel"
+export CMAKE_PREFIX_PATH=${CONDA_PREFIX}
 conda run -n osmordred python -m build
 
 echo "✅ Wheel build complete"

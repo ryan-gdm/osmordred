@@ -1,3 +1,25 @@
 [build-system]
-requires = ["setuptools", "wheel", "scikit-build", "numpy==1.26.4"]
-build-backend = "setuptools.build_meta"
+requires = [
+  "scikit-build-core>=0.5"
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "osmordred"
+version = "0.2.0"
+description = "A Python package to generate osmordred features using RDKit 2023.09.3, Lapack."
+requires-python = ">=3.11"
+license = {text = "BSD-3-Clause"}
+authors = [
+  {name = "Guillaume Godin", email = "guillaume.godin@gmail.com"},
+  {name = "Ryan Greenhalgh", email = "ryan.greenhalgh@hotmail.co.uk"}
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD-3-Clause License",
+  "Operating System :: OS Independent",
+]
+
+[tool.scikit-build]
+build-dir = "dist"
+wheel.packages = ["osmordred"]
