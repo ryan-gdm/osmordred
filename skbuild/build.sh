@@ -15,6 +15,7 @@ conda create -y -n osmordred \
     eigen \
     lapack \
     ninja \
+    mordred \
     python-build \
     rdkit=${RDKIT_VERSION} \
     blas=*=*mkl \
