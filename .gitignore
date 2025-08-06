@@ -6,4 +6,5 @@ dist
 MANIFEST.in
 .DS_Store
 *.csv
+!skbuild/test/data/example.csv
 *.egg-info

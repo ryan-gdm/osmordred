@@ -1,158 +1,154 @@
 from rdkit import Chem
 import numpy as np
-import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from mordred import Calculator, descriptors
 
+import time
+import pandas as pd
+from rdkit import Chem
+from mordred import Calculator, descriptors
 import osmordred as rd
 
 
-# Define descriptor computation function
-def CalcOsmordred(smiles, version=2):
+def CalcOsmordred(mol: Chem.Mol) -> np.ndarray | None:
+    version = 2
+    doExEstate = True
 
 
-    if version == 1:
-        " original version from Mordred"
-        v = 1
-        doExEstate = False
-    else:
-        " expended descriptors with more features and fixed InformationContent in cpp"
-        v = 2
-        doExEstate = True
+    descriptor_funcs = [
+        (rd.CalcABCIndex, [mol]),
+        (rd.CalcAcidBase, [mol]),
+        (rd.CalcAdjacencyMatrix, [mol, version]),
+        (rd.CalcAromatic, [mol]),
+        (rd.CalcAtomCount, [mol, version]),
+        (rd.CalcAutocorrelation, [mol]),
+        (rd.CalcBCUT, [mol]),
+        (rd.CalcBalabanJ, [mol]),
+        (rd.CalcBaryszMatrix, [mol]),
+        (rd.CalcBertzCT, [mol]),
+        (rd.CalcBondCount, [mol]),
+        (rd.CalcRNCGRPCG, [mol]),
+        (rd.CalcCarbonTypes, [mol, version]),
+        (rd.CalcChi, [mol]),
+        (rd.CalcConstitutional, [mol]),
+        (rd.CalcDetourMatrix, [mol]),
+        (rd.CalcDistanceMatrix, [mol, version]),
+        (rd.CalcEState, [mol, doExEstate]),
+        (rd.CalcEccentricConnectivityIndex, [mol]),
+        (rd.CalcExtendedTopochemicalAtom, [mol]),
+        (rd.CalcFragmentComplexity, [mol]),
+        (rd.CalcFramework, [mol]),
+        (rd.CalcHydrogenBond, [mol]),
+        (rd.CalcLogS, [mol]),
+        (rd.CalcInformationContent, [mol, 5]),
+        (rd.CalcKappaShapeIndex, [mol]),
+        (rd.CalcLipinski, [mol]),
+        (rd.CalcMcGowanVolume, [mol]),
+        (rd.CalcMoeType, [mol]),
+        (rd.CalcMolecularDistanceEdge, [mol]),
+        (rd.CalcMolecularId, [mol]),
+        (rd.CalcPathCount, [mol]),
+        (rd.CalcPolarizability, [mol]),
+        (rd.CalcRingCount, [mol]),
+        (rd.CalcRotatableBond, [mol]),
+        (rd.CalcSLogP, [mol]),
+        (rd.CalcTopoPSA, [mol]),
+        (rd.CalcTopologicalCharge, [mol]),
+        (rd.CalcTopologicalIndex, [mol]),
+        (rd.CalcVdwVolumeABC, [mol]),
+        (rd.CalcVertexAdjacencyInformation, [mol]),
+        (rd.CalcWalkCount, [mol]),
+        (rd.CalcWeight, [mol]),
+        (rd.CalcWienerIndex, [mol]),
+        (rd.CalcZagrebIndex, [mol]),
+        (rd.CalcPol, [mol]),
+        (rd.CalcMR, [mol]),
+        (rd.CalcODT, [mol]),
+        (rd.CalcFlexibility, [mol]),
+        (rd.CalcSchultz, [mol]),
+        (rd.CalcAlphaKappaShapeIndex, [mol]),
+        (rd.CalcHEState, [mol]),
+        (rd.CalcBEState, [mol]),
+        (rd.CalcAbrahams, [mol]),
+        (rd.CalcANMat, [mol]),
+        (rd.CalcASMat, [mol]),
+        (rd.CalcAZMat, [mol]),
+        (rd.CalcDSMat, [mol]),
+        (rd.CalcDN2Mat, [mol]),
+        (rd.CalcFrags, [mol]),
+        (rd.CalcAddFeatures, [mol])
+    ]
 
-        mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return None # Return an empty array instead of None
-    results = []
     try:
-        results.append(np.array(rd.CalcABCIndex(mol)))
-        results.append(np.array(rd.CalcAcidBase(mol)))
-        results.append(np.array(rd.CalcAdjacencyMatrix(mol, v))) # add sm1 removed in v1.1
-        results.append(np.array(rd.CalcAromatic(mol)))
-        results.append(np.array(rd.CalcAtomCount(mol, v)))  #  add nHetero in v1.1
-        results.append(np.array(rd.CalcAutocorrelation(mol)))
-        results.append(np.array(rd.CalcBCUT(mol)))
-        results.append(np.array(rd.CalcBalabanJ(mol)))
-        results.append(np.array(rd.CalcBaryszMatrix(mol)))
-        results.append(np.array(rd.CalcBertzCT(mol)))
-        results.append(np.array(rd.CalcBondCount(mol)))
-        results.append(np.array(rd.CalcRNCGRPCG(mol))) # CPSA 2D descriptors on charges
-        results.append(np.array(rd.CalcCarbonTypes(mol, v))) # add calcFractionCSP3 in v1.1
-        results.append(np.array(rd.CalcChi(mol)))
-        results.append(np.array(rd.CalcConstitutional(mol)))
-        results.append(np.array(rd.CalcDetourMatrix(mol))) # add sm1 since v1.1
-        results.append(np.array(rd.CalcDistanceMatrix(mol,v)))
-        results.append(np.array(rd.CalcEState(mol, doExEstate))) # no impact True/False
-        results.append(np.array(rd.CalcEccentricConnectivityIndex(mol)))
-        results.append(np.array(rd.CalcExtendedTopochemicalAtom(mol)))
-        results.append(np.array(rd.CalcFragmentComplexity(mol)))
-        results.append(np.array(rd.CalcFramework(mol)))
-        results.append(np.array(rd.CalcHydrogenBond(mol)))
-        if version==1:
-            results.append(CalcIC(mol))
-        else:
-            results.append(np.array(rd.CalcLogS(mol))) # added if version > 1!
-            results.append(np.array(rd.CalcInformationContent(mol,5)))
-
-        results.append(np.array(rd.CalcKappaShapeIndex(mol)))
-        results.append(np.array(rd.CalcLipinski(mol)))
-        results.append(np.array(rd.CalcMcGowanVolume(mol)))
-        results.append(np.array(rd.CalcMoeType(mol)))
-        results.append(np.array(rd.CalcMolecularDistanceEdge(mol)))
-        results.append(np.array(rd.CalcMolecularId(mol)))
-        results.append(np.array(rd.CalcPathCount(mol)))
-        results.append(np.array(rd.CalcPolarizability(mol)))
-        results.append(np.array(rd.CalcRingCount(mol)))
-        results.append(np.array(rd.CalcRotatableBond(mol)))
-        results.append(np.array(rd.CalcSLogP(mol)))
-        results.append(np.array(rd.CalcTopoPSA(mol)))
-        results.append(np.array(rd.CalcTopologicalCharge(mol)))
-        results.append(np.array(rd.CalcTopologicalIndex(mol)))
-        results.append(np.array(rd.CalcVdwVolumeABC(mol)))
-        results.append(np.array(rd.CalcVertexAdjacencyInformation(mol)))
-        results.append(np.array(rd.CalcWalkCount(mol)))
-        results.append(np.array(rd.CalcWeight(mol)))
-        results.append(np.array(rd.CalcWienerIndex(mol)))
-        results.append(np.array(rd.CalcZagrebIndex(mol)))
-        if version>1:
-        #  new descriptors added
-            results.append(np.array(rd.CalcPol(mol))) 
-            results.append(np.array(rd.CalcMR(mol))) 
-            results.append(np.array(rd.CalcODT(mol))) # not yet implemented return 1!
-            results.append(np.array(rd.CalcFlexibility(mol))) 
-            results.append(np.array(rd.CalcSchultz(mol)))
-            results.append(np.array(rd.CalcAlphaKappaShapeIndex(mol))) 
-            results.append(np.array(rd.CalcHEState(mol))) # very slightly slower
-            results.append(np.array(rd.CalcBEState(mol))) # as a true impact
-            results.append(np.array(rd.CalcAbrahams(mol))) # as a true impact : vf2 smartparser 
-            # new triplet features x5 faster using combined Linear Equation resolution instead of per vector targets...
-            results.append(np.array(rd.CalcANMat(mol)))
-            results.append(np.array(rd.CalcASMat(mol)))
-            results.append(np.array(rd.CalcAZMat(mol)))
-            results.append(np.array(rd.CalcDSMat(mol)))
-            results.append(np.array(rd.CalcDN2Mat(mol)))
-            results.append(np.array(rd.CalcFrags(mol)))
-            results.append(np.array(rd.CalcAddFeatures(mol)))
-            
-        results_to_concat = [np.atleast_1d(r) for r in results]
-        return np.concatenate(results_to_concat)
+        results = [np.atleast_1d(func(*params)) for func, params in descriptor_funcs]
+        return np.concatenate(results)
     except Exception as e:
-        print(f"Error processing molecule {smiles}: {e}")
+        print(f"Error processing molecule {mol}: {e}")
         return None
 
 
 
+import time
+import pandas as pd
+from rdkit import Chem
+import numpy as np
 
-def Calculate(smiles_list, n_jobs=4,  version=1):
+def benchmark_calc_function(mols):
+    print("\nBenchmarking: CalcOsmordred(smiles) per molecule")
+    times = []
     results = []
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        # Submit tasks with their indices
-        futures = {executor.submit(CalcOsmordred, smi, version): idx for idx, smi in enumerate(smiles_list)}
-        for future in as_completed(futures):
-            idx = futures[future]  # Retrieve the index of the SMILES string
-            try:
-                result = future.result()
-                if result is not None:
-                    results.append((idx, result))  # Store the index and the result
-            except Exception as e:
-                print(f"Error processing molecule at index {idx}: {e}")
 
-    # Sort results by the original index to maintain order
-    results.sort(key=lambda x: x[0])
-    ordered_results = [res[1] for res in results]
-    return ordered_results
+    for mol in mols:
+        start = time.time()
+        result = CalcOsmordred(mol)
+        end = time.time()
 
+        times.append(end - start)
+        results.append(result)
 
+    times = np.array(times)
+    print(f"Processed {len(results)} molecules")
+    print(f"Total time: {times.sum():.2f} seconds")
+    print(f"Avg time per mol: {times.mean():.6f} s | Min: {times.min():.6f} s | Max: {times.max():.6f} s | Std: {times.std():.6f} s")
+    print(f"Example output shape: {results[0].shape if hasattr(results[0], 'shape') else type(results[0])}")
 
+    return times
 
+def benchmark_calculator_class(mols):
+    print("\nBenchmarking: Calculator.map(mol) per molecule")
+    calc = Calculator(descriptors)
+    times = []
+    results = []
+
+    for mol in mols:
+        start = time.time()
+        result = list(calc.map([mol]))[0]
+        end = time.time()
+
+        times.append(end - start)
+        results.append(result)
+
+    times = np.array(times)
+    print(f"Processed {len(results)} molecules")
+    print(f"Total time: {times.sum():.2f} seconds")
+    print(f"Avg time per mol: {times.mean():.6f} s | Min: {times.min():.6f} s | Max: {times.max():.6f} s | Std: {times.std():.6f} s")
+
+    descriptor_names = [str(d) for d in calc.descriptors]
+    df = pd.DataFrame(results, columns=descriptor_names)
+    print(f"Number of descriptors: {df.shape[1]}")
+
+    return times
 
 if __name__ == "__main__":
-    print("Osmordred library contents:")
-    print(dir(rd))
-    version = 2
-    smiles = ['CCCO','CCCN','c1ccccc1']
-    smiles_list = smiles
-    n_jobs = 1  # Number of cores to use
+    df = pd.read_csv("data/example.csv")
+    smiles_list = df["SMILES"].dropna().tolist()
+    mols = [Chem.MolFromSmiles(s) for s in smiles_list if Chem.MolFromSmiles(s)]
 
-    print(f"Processing {len(smiles_list)} molecules with {n_jobs} cores...")
-    results = Calculate(smiles_list, n_jobs=n_jobs, version=version)
-    print(results)
-    # Convert to DataFrame and save to file
-    df_results = pd.DataFrame(results)
-    
-    print(f"Finished processing. Results shape: {df_results.shape}")
-    df_results.to_csv('Myfeatures.csv', index=False)
+    print(f"Total molecules to process: {len(mols)}")
 
-    # additional wrappers from double/int into std::vector of double
-    print(list(rd.CalcSchultz(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcPol(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcMR(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcODT(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcFlexibility(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcLogS(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcHydrogenBond(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcFramework(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcBertzCT(Chem.MolFromSmiles(smiles[-1]))))
-    print(list(rd.CalcBalabanJ(Chem.MolFromSmiles(smiles[-1]))))
+    times_custom = benchmark_calc_function(mols)
+    times_mordred = benchmark_calculator_class(mols)
 
-    print(list(rd.CalcInformationContent(Chem.MolFromSmiles(smiles[0]),5)))
-
+    print("\nSummary:")
+    print(f"Custom CalcOsmordred avg time: {np.mean(times_custom)*1000:.2f} ms/molecule")
+    print(f"Mordred Calculator avg time  : {np.mean(times_mordred)*1000:.2f} ms/molecule")
