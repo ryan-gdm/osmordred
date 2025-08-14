@@ -4,9 +4,9 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "osmordred"
-version = "0.2.0"
-description = "A Python package to generate osmordred features using RDKit 2023.09.3, Lapack."
-requires-python = ">=3.11"
+version = "0.3.0"
+description = "A Python package to generate osmordred features using RDKit 2025.03.1, Lapack."
+requires-python = ">=3.12"
 
 license = { file = "LICENSE" }
 
@@ -14,7 +14,7 @@ authors = [{ name = "Guillaume Godin", email = "guillaume.godin@gmail.com" }]
 
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
 ]
