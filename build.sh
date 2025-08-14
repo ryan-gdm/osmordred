@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
-export RDKIT_VERSION=2025.03.1
-export PYTHON_VERSION=3.13
+# === CONFIG ===
+export PYTHON_VERSION=3.12
 export BOOST_VERSION="1.86.*"
+# ==============
 
 echo "Removing existing environment (if present)"
 conda env remove -y -n osmordred || true
@@ -18,7 +19,7 @@ conda create -y -n osmordred \
     lapack \
     ninja \
     python-build \
-    rdkit-dev=${RDKIT_VERSION} \
+    rdkit-dev \
     blas=*=*mkl \
     -c conda-forge
 
@@ -37,8 +38,18 @@ conda run -n osmordred python -m build
 
 echo "✅ Wheel build complete"
 
-echo "Installing the wheel"
-pip install dist/osmordred-0.3.0-cp313-cp313-linux_x86_64.whl --force-reinstall
+# Detect the correct cpXXX tag for the installed Python
+PYTHON_TAG=$(python -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
+
+# Find matching wheel in dist/
+WHEEL_FILE=$(ls dist/*${PYTHON_TAG}*.whl | head -n 1)
+if [[ -z "$WHEEL_FILE" ]]; then
+    echo "❌ Could not find wheel for ${PYTHON_TAG}"
+    exit 1
+fi
+
+echo "Installing the wheel: $WHEEL_FILE"
+pip install "$WHEEL_FILE" --force-reinstall
 
 echo "✅ Wheel installation complete"
 echo "Running post-installation tests..."
