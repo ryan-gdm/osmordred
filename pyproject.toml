@@ -3,7 +3,7 @@ requires = ["scikit-build-core>=0.5"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "pypi-osmordred"
+name = "osmordred"
 version = "0.2.0"
 description = "A Python package to generate osmordred features using RDKit 2023.09.3, Lapack."
 requires-python = ">=3.11"
