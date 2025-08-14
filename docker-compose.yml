@@ -5,6 +5,7 @@ services:
     build: .
     volumes:
       - .:/osmordred
+      - /var/run/docker.sock:/var/run/docker.sock
     command: tail -f /dev/null
     platform: linux/amd64
     container_name: osmordred

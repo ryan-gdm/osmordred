@@ -16,5 +16,7 @@ RUN apt-get update && apt-get install -y \
     && cmake --version \
     && rm cmake-${CMAKE_VERSION}-${CMAKE_OS}-${CMAKE_ARCH}.tar.gz \
     && rm -rf /var/lib/apt/lists/*
-    
+
+RUN apt-get update && apt-get install -y docker.io
+
 WORKDIR /osmordred
