@@ -1,12 +1,9 @@
 from rdkit import Chem
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from mordred import Calculator, descriptors
 
 import time
 import pandas as pd
 from rdkit import Chem
-from mordred import Calculator, descriptors
 import osmordred as rd
 
 
@@ -87,12 +84,6 @@ def CalcOsmordred(mol: Chem.Mol) -> np.ndarray | None:
         return None
 
 
-
-import time
-import pandas as pd
-from rdkit import Chem
-import numpy as np
-
 def benchmark_calc_function(mols):
     print("\nBenchmarking: CalcOsmordred(smiles) per molecule")
     times = []
@@ -114,30 +105,6 @@ def benchmark_calc_function(mols):
 
     return times
 
-def benchmark_calculator_class(mols):
-    print("\nBenchmarking: Calculator.map(mol) per molecule")
-    calc = Calculator(descriptors)
-    times = []
-    results = []
-
-    for mol in mols:
-        start = time.time()
-        result = list(calc.map([mol]))[0]
-        end = time.time()
-
-        times.append(end - start)
-        results.append(result)
-
-    times = np.array(times)
-    print(f"Processed {len(results)} molecules")
-    print(f"Total time: {times.sum():.2f} seconds")
-    print(f"Avg time per mol: {times.mean():.6f} s | Min: {times.min():.6f} s | Max: {times.max():.6f} s | Std: {times.std():.6f} s")
-
-    descriptor_names = [str(d) for d in calc.descriptors]
-    df = pd.DataFrame(results, columns=descriptor_names)
-    print(f"Number of descriptors: {df.shape[1]}")
-
-    return times
 
 if __name__ == "__main__":
     df = pd.read_csv("data/example.csv")
@@ -147,8 +114,6 @@ if __name__ == "__main__":
     print(f"Total molecules to process: {len(mols)}")
 
     times_custom = benchmark_calc_function(mols)
-    times_mordred = benchmark_calculator_class(mols)
 
     print("\nSummary:")
     print(f"Custom CalcOsmordred avg time: {np.mean(times_custom)*1000:.2f} ms/molecule")
-    print(f"Mordred Calculator avg time  : {np.mean(times_mordred)*1000:.2f} ms/molecule")

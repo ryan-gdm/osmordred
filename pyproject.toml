@@ -1,0 +1,28 @@
+[build-system]
+requires = ["scikit-build-core>=0.5"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pypi-osmordred"
+version = "0.2.0"
+description = "A Python package to generate osmordred features using RDKit 2023.09.3, Lapack."
+requires-python = ">=3.11"
+
+license = { file = "LICENSE" }
+
+authors = [{ name = "Guillaume Godin", email = "guillaume.godin@gmail.com" }]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+]
+
+[tool.scikit-build]
+build-dir = "dist"
+wheel.packages = ["osmordred"]
+wheel.expand-macos-universal-tags = true
+
+[project.urls]
+Homepage = "https://github.com/ryan-gdm/osmordred"

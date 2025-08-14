@@ -22,7 +22,7 @@ conda create -y -n osmordred \
     -c conda-forge
 
 echo "Cleaning previous build artifacts"
-rm -rf _skbuild osmordred.egg-info dist
+rm -rf _src osmordred.egg-info dist
 
 # Initialize conda for bash shell
 eval "$(conda shell.bash hook)"
@@ -37,6 +37,6 @@ conda run -n osmordred python -m build
 echo "✅ Wheel build complete"
 
 echo "Installing the wheel"
-pip install dist/osmordred-0.2.0-cp311-cp311-linux_x86_64.whl --force-reinstall
+pip install dist/pypi_osmordred-0.2.0-cp311-cp311-linux_x86_64.whl --force-reinstall
 
 echo "✅ Wheel installation complete"

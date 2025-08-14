@@ -1,3 +1,0 @@
-include CMakeLists.txt
-include README.md
-include osmordred/osmordred.cpp

@@ -17,7 +17,6 @@ docker exec -it osmordred bash
 Then inside the container:
 
 ```bash
-cd skbuild
 bash build.sh
 ```
 

@@ -1,10 +1,10 @@
 .vscode
 __pycache__
-_skbuild
+_src
 dist
 
 MANIFEST.in
 .DS_Store
 *.csv
-!skbuild/test/data/example.csv
+!src/test/data/example.csv
 *.egg-info
